@@ -31,7 +31,7 @@ Navigate back to the root directory of the repo, and create a new xunit test pro
 
 Navigate to SpiritualDevalApp.Tests
 
-Add a reference to the projectL
+Add a reference to the project:
     dotnet add reference ../SpiritualDevalApp/SpiritualDevalApp.csproj
 
 Ensure that xunit versions in the project and test project are the same
