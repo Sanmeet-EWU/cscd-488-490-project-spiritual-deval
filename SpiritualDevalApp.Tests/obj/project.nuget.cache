@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "dgSpecHash": "9zsgX2id8k7lNdFDcHkBaY8mCNoF+JGB29XUk9IhOWdVDv2f0NwlMEBJ8Vtd1pL/bgZ/JIb/WilbQ2L/cr39gg==",
+  "success": true,
+  "projectFilePath": "/Users/andree/Documents/cscd-488-490-project-spiritual-deval/SpiritualDevalApp.Tests/SpiritualDevalApp.Tests.csproj",
+  "expectedPackageFiles": [
+    "/Users/andree/.nuget/packages/coverlet.collector/6.0.0/coverlet.collector.6.0.0.nupkg.sha512",
+    "/Users/andree/.nuget/packages/microsoft.codecoverage/17.6.0/microsoft.codecoverage.17.6.0.nupkg.sha512",
+    "/Users/andree/.nuget/packages/microsoft.net.test.sdk/17.6.0/microsoft.net.test.sdk.17.6.0.nupkg.sha512",
+    "/Users/andree/.nuget/packages/microsoft.testplatform.objectmodel/17.6.0/microsoft.testplatform.objectmodel.17.6.0.nupkg.sha512",
+    "/Users/andree/.nuget/packages/microsoft.testplatform.testhost/17.6.0/microsoft.testplatform.testhost.17.6.0.nupkg.sha512",
+    "/Users/andree/.nuget/packages/newtonsoft.json/13.0.1/newtonsoft.json.13.0.1.nupkg.sha512",
+    "/Users/andree/.nuget/packages/nuget.frameworks/5.11.0/nuget.frameworks.5.11.0.nupkg.sha512",
+    "/Users/andree/.nuget/packages/system.reflection.metadata/1.6.0/system.reflection.metadata.1.6.0.nupkg.sha512",
+    "/Users/andree/.nuget/packages/xunit/2.9.2/xunit.2.9.2.nupkg.sha512",
+    "/Users/andree/.nuget/packages/xunit.abstractions/2.0.3/xunit.abstractions.2.0.3.nupkg.sha512",
+    "/Users/andree/.nuget/packages/xunit.analyzers/1.16.0/xunit.analyzers.1.16.0.nupkg.sha512",
+    "/Users/andree/.nuget/packages/xunit.assert/2.9.2/xunit.assert.2.9.2.nupkg.sha512",
+    "/Users/andree/.nuget/packages/xunit.core/2.9.2/xunit.core.2.9.2.nupkg.sha512",
+    "/Users/andree/.nuget/packages/xunit.extensibility.core/2.9.2/xunit.extensibility.core.2.9.2.nupkg.sha512",
+    "/Users/andree/.nuget/packages/xunit.extensibility.execution/2.9.2/xunit.extensibility.execution.2.9.2.nupkg.sha512",
+    "/Users/andree/.nuget/packages/xunit.runner.visualstudio/2.4.5/xunit.runner.visualstudio.2.4.5.nupkg.sha512"
+  ],
+  "logs": []
+}
