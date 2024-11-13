@@ -1,0 +1,42 @@
+# Ignore build outputs and dependencies
+bin/
+obj/
+
+# User-specific files
+.vscode/
+*.swp
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# ASP.NET/Blazor-specific files
+appsettings.Development.json
+appsettings.*.json  # Ignore environment-specific appsettings files if they contain secrets
+
+# Local environment files
+.env
+
+# IDE files
+.idea/
+*.iml
+
+# ASP.NET Core Identity Database
+*.db
+
+# Package directories
+node_modules/
+
+# Publish output
+wwwroot/
+
+# NPM package lock files
+package-lock.json
+yarn.lock
