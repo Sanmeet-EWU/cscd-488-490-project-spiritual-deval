@@ -1,3 +1,15 @@
+# Ignore build output directories
+/bin/
+/obj/
+/Debug/
+/Release/
+
+# Ignore cache files
+**/*.cache
+**/cache/
+
+
+
 # Ignore build outputs and dependencies
 bin/
 obj/
