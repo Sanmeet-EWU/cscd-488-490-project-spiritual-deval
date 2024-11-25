@@ -1,0 +1,57 @@
+@page "/CreateAccount"
+@rendermode InteractiveServer
+<PageTitle>Create Account</PageTitle>
+<h2>Enter your details</h2>
+<!-- Form to enter email, password, phone, and address -->
+<EditForm Model="user" OnValidSubmit="HandleValidSubmit">
+    <div class="form-group">
+        <label for="emailInput">Email:</label>
+        <InputText id="emailInput" @bind-Value="user.Email" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="passwordInput">Password:</label>
+        <InputText id="passwordInput" @bind-Value="user.Password" class="form-control" type="password" />
+    </div>
+    <div class="form-group">
+        <label for="phoneInput">Phone:</label>
+        <InputText id="phoneInput" @bind-Value="user.Phone" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="addressInput">Address:</label>
+        <InputText id="addressInput" @bind-Value="user.Address" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+@if (!string.IsNullOrEmpty(user.Email))
+{
+    <p>Your email: @user.Email</p>
+}
+@if (!string.IsNullOrEmpty(user.Password))
+{
+    <p>Your password: @user.Password</p>
+}
+@if (!string.IsNullOrEmpty(user.Phone))
+{
+    <p>Your phone: @user.Phone</p>
+}
+@if (!string.IsNullOrEmpty(user.Address))
+{
+    <p>Your address: @user.Address</p>
+}
+@code {
+    // The User class
+    private class User
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
+    }
+
+    private User user = new User();
+
+    private void HandleValidSubmit()
+    {
+        Console.WriteLine($"Submitted {user.Email} {user.Password} {user.Phone} {user.Address}");
+    }
+}
