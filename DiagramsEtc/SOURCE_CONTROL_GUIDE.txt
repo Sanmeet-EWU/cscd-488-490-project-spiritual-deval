@@ -1,0 +1,22 @@
+Clone the Spiritual Deval repo:
+    git clone https://github.com/Sanmeet-EWU/cscd-488-490-project-spiritual-deval
+
+Ensure you have access to collaborate
+
+Create a new branch:
+    git checkout -b feature/your-feature-name
+
+Commit any changes:
+    git add .
+    git commit -m "Add new feature or fix description"
+
+Push to the branch:
+    git push origin feature/your-feature-name   
+
+Once changes are done, create a pull request from your feature branch to main
+
+After code is approved and reviewed, merge the PR into the main branch
+
+To sync your locla repository with the remote, regularly pull changes from the main branch:
+    git checkout main
+    git pull origin main
