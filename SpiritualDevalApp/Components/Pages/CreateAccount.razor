@@ -1,13 +1,8 @@
-<<<<<<< HEAD
-=======
-
->>>>>>> e068f5e... CreateAccount page
 @page "/CreateAccount"
 @rendermode InteractiveServer
 <PageTitle>Create Account</PageTitle>
 <h2>Enter your details</h2>
 <!-- Form to enter email, password, phone, and address -->
-<<<<<<< HEAD
 <EditForm Model="user" OnValidSubmit="HandleValidSubmit">
     <div class="form-group">
         <label for="emailInput">Email:</label>
@@ -60,51 +55,3 @@
         Console.WriteLine($"Submitted {user.Email} {user.Password} {user.Phone} {user.Address}");
     }
 }
-=======
-<EditForm Model="this" OnValidSubmit="HandleValidSubmit">
-    <div class="form-group">
-        <label for="emailInput">Email:</label>
-        <InputText id="emailInput" @bind-Value="email" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label for="passwordInput">Password:</label>
-        <InputText id="passwordInput" @bind-Value="password" class="form-control" type="password" />
-    </div>
-    <div class="form-group">
-        <label for="phoneInput">Phone:</label>
-        <InputText id="phoneInput" @bind-Value="phone" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label for="addressInput">Address:</label>
-        <InputText id="addressInput" @bind-Value="address" class="form-control" />
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-</EditForm>
-@if (!string.IsNullOrEmpty(email))
-{
-    <p>Your email: @email</p>
-}
-@if (!string.IsNullOrEmpty(password))
-{
-    <p>Your password: @password</p>
-}
-@if (!string.IsNullOrEmpty(phone))
-{
-    <p>Your phone: @phone</p>
-}
-@if (!string.IsNullOrEmpty(address))
-{
-    <p>Your address: @address</p>
-}
-@code {
-    private string email = ""; // For the email input
-    private string password = ""; // For the password input
-    private string phone = ""; // For the phone input
-    private string address = ""; // For the address input
-    private void HandleValidSubmit()
-    {
-        // Print "submitted" to the console when the form is submitted
-        Console.WriteLine($"Submitted {email} {password} {phone} {address}");
-    }
-}
->>>>>>> e068f5e... CreateAccount page
