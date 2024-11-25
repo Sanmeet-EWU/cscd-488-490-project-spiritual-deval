@@ -12,7 +12,7 @@
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    color: white;
+    color: rgb(255, 255, 255);
     padding: 0.5rem 1rem;
     border-radius: 4px;
     transition: background-color 0.3s;
@@ -21,11 +21,11 @@
 }
 
 .nav-link.active {
-    background-color: rgba(255, 255, 255, 0.37);
+    background-color: rgb(255, 255, 255);
 }
 
 .nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgb(255, 255, 255);
 }
 
 /* Reuse icon styles */
