@@ -1,7 +1,123 @@
 @page "/donation"
 
-<PageTitle>Donatation</PageTitle>
+<PageTitle>Donation</PageTitle>
 
-<h1>Donation</h1>
+<h1 class="header-text">Support the Spiritual Temple</h1>
 
-Thank you for your generosity! How would you like to donate?
+<p>Thank you for considering a donation to support our temple and its mission. Your generosity helps us continue our work for the community.</p>
+
+<form>
+    <!-- First Name -->
+    <div class="input-group">
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" placeholder="Enter your first name" />
+    </div>
+
+    <!-- Last Name -->
+    <div class="input-group">
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" placeholder="Enter your last name" />
+    </div>
+
+    <!-- Phone Number -->
+    <div class="input-group">
+        <label for="phoneNumber">Phone Number:</label>
+        <input type="tel" id="phoneNumber" placeholder="Enter your phone number" />
+    </div>
+
+    <!-- Email -->
+    <div class="input-group">
+        <label for="email">Email Address:</label>
+        <input type="email" id="email" placeholder="Enter your email address" />
+    </div>
+
+    <!-- Donation Amount -->
+    <div class="input-group">
+        <label for="donationAmount">How much do you wish to donate?</label>
+        <input type="number" id="donationAmount" placeholder="Enter amount in USD" />
+    </div>
+
+    <!-- Donation Type -->
+    <div class="input-group">
+        <label for="donationType">Donation Type:</label>
+        <select id="donationType">
+            <option value="one-time">One-Time</option>
+            <option value="recurring">Recurring</option>
+        </select>
+    </div>
+
+    <!-- Message -->
+    <div class="input-group">
+        <label for="message">Message (Optional):</label>
+        <textarea id="message" placeholder="Write a message or specify your intention for the donation"></textarea>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="input-group">
+        <button type="submit">Submit Donation</button>
+    </div>
+</form>
+
+<style>
+    .header-text {
+        text-align: center;
+        font-size: 2em;
+        color: #556b2f; /* Olive green */
+        font-family: 'Georgia', 'Times New Roman', serif; /* Elegant serif font */
+        margin: 50px 0 20px;
+    }
+
+    p {
+        text-align: center;
+        margin: 20px auto;
+        max-width: 600px;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 600px; /* Wider form */
+        margin: 20px auto;
+    }
+
+    .input-group {
+        width: 100%; /* Input boxes take up full form width */
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    input, select, textarea, button {
+        width: 100%;
+        font-size: 1em;
+        box-sizing: border-box; /* Ensures padding doesn't affect size */
+    }
+
+    input, select {
+        height: 35px; /* Slightly taller for a comfortable look */
+        padding: 5px; /* Small padding inside the box */
+    }
+
+    textarea {
+        height: 100px; /* Larger message box */
+        padding: 5px;
+    }
+
+    button {
+        background-color: #4f7c5d; /* Darker green */
+        color: white;
+        border: 2px solid #3e654a; /* Even darker border for contrast */
+        cursor: pointer;
+        padding: 5px; /* Reduced padding inside the button */
+        height: 40px; /* Consistent height */
+    }
+
+    button:hover {
+        background-color: #3e654a; /* Even darker green on hover */
+    }
+</style>
