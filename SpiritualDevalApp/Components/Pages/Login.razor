@@ -1,0 +1,46 @@
+@page "/Login"
+@rendermode InteractiveServer
+<PageTitle>Login</PageTitle>
+<h2>Login</h2>
+<p>Please enter your login credentials</p>
+<div class="form-container">
+    <EditForm Model="loginUser" OnValidSubmit="HandleValidSubmit">
+        <div class="form-group">
+            <label for="emailInput">Email:</label>
+            <InputText id="emailInput" @bind-Value="loginUser.Email" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="passwordInput">Password:</label>
+            <InputText id="passwordInput" @bind-Value="loginUser.Password" class="form-control" type="password" />
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+    </EditForm>
+
+    <!-- Create Account Link -->
+    <NavLink class="btn btn-secondary mt-3" href="/CreateAccount">Create Account</NavLink>
+</div>
+
+@if (!string.IsNullOrEmpty(loginUser.Email))
+{
+    <p>Your email: @loginUser.Email</p>
+}
+@if (!string.IsNullOrEmpty(loginUser.Password))
+{
+    <p>Your password: @loginUser.Password</p>
+}
+
+@code {
+    // The LoginUser class
+    private class LoginUser
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
+    private LoginUser loginUser = new LoginUser();
+
+    private void HandleValidSubmit()
+    {
+        Console.WriteLine($"Login submitted: Email: {loginUser.Email}, Password: {loginUser.Password}");
+    }
+}
