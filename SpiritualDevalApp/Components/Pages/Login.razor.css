@@ -3,7 +3,7 @@
     justify-content: center;
     align-items: center;
     height: calc(100vh - 3rem); /* Adjust for navbar height */
-    background-color: #f9f9f9;
+    background: #e7dfd8;
     padding: 1rem;
 }
 
