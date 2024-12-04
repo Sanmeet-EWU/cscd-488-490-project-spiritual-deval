@@ -1,27 +1,33 @@
 @page "/CreateAccount"
+@layout MainLayout
 @rendermode InteractiveServer
 <PageTitle>Create Account</PageTitle>
 <h2>Enter your details</h2>
 <!-- Form to enter email, password, phone, and address -->
-<EditForm Model="user" OnValidSubmit="HandleValidSubmit">
-    <div class="form-group">
-        <label for="emailInput">Email:</label>
-        <InputText id="emailInput" @bind-Value="user.Email" class="form-control" />
+<div class="create-account-container">
+    <div class="create-account-box">
+        <EditForm Model="user" OnValidSubmit="HandleValidSubmit">
+            <div class="form-group">
+                <label for="emailInput">Email:</label>
+                <InputText id="emailInput" @bind-Value="user.Email" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="passwordInput">Password:</label>
+                <InputText id="passwordInput" @bind-Value="user.Password" class="form-control" type="password" />
+            </div>
+            <div class="form-group">
+                <label for="phoneInput">Phone:</label>
+                <InputText id="phoneInput" @bind-Value="user.Phone" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="addressInput">Address:</label>
+                <InputText id="addressInput" @bind-Value="user.Address" class="form-control" />
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </EditForm>
     </div>
-    <div class="form-group">
-        <label for="passwordInput">Password:</label>
-        <InputText id="passwordInput" @bind-Value="user.Password" class="form-control" type="password" />
-    </div>
-    <div class="form-group">
-        <label for="phoneInput">Phone:</label>
-        <InputText id="phoneInput" @bind-Value="user.Phone" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label for="addressInput">Address:</label>
-        <InputText id="addressInput" @bind-Value="user.Address" class="form-control" />
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-</EditForm>
+</div>
+
 @if (!string.IsNullOrEmpty(user.Email))
 {
     <p>Your email: @user.Email</p>
@@ -38,8 +44,8 @@
 {
     <p>Your address: @user.Address</p>
 }
+
 @code {
-    // The User class
     private class User
     {
         public string Email { get; set; } = string.Empty;
