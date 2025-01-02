@@ -3,7 +3,7 @@
 @rendermode InteractiveServer
 <PageTitle>Create Account</PageTitle>
 <h2>Enter your details</h2>
-<!-- Form to enter email, password, phone, and address -->
+
 <div class="create-account-container">
     <div class="create-account-box">
         <EditForm Model="user" OnValidSubmit="HandleValidSubmit">
@@ -46,18 +46,15 @@
 }
 
 @code {
-    private class User
-    {
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public string Phone { get; set; } = string.Empty;
-        public string Address { get; set; } = string.Empty;
-    }
-
     private User user = new User();
 
-    private void HandleValidSubmit()
+    private async Task HandleValidSubmit()
     {
-        Console.WriteLine($"Submitted {user.Email} {user.Password} {user.Phone} {user.Address}");
+        await DbContext.Users.AddAsync(user);
+        await DbContext.SaveChangesAsync();
+        Console.WriteLine($"Saved: {user.Email}, {user.Password}, {user.Phone}, {user.Address}");
     }
+
+    [Inject]
+    private AppDbContext DbContext { get; set; }
 }

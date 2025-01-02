@@ -1,6 +1,14 @@
+using Microsoft.EntityFrameworkCore;
 using SpiritualDevalApp.Components;
 // h
 var builder = WebApplication.CreateBuilder(args);
+
+// Add DbContext with the connection string from appsettings.json
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
+    ));
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
