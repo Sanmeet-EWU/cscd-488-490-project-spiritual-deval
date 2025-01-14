@@ -1,15 +1,11 @@
+
 @page "/CreateAccount"
 @layout MainLayout
 @rendermode InteractiveServer
 <PageTitle>Create Account</PageTitle>
-
-<!-- Form to enter email, password, phone, and address -->
-=======
 <h2>Enter your details</h2>
-
 <div class="create-account-container">
     <div class="create-account-box">
-        <h2>Enter your details</h2>
         <EditForm Model="user" OnValidSubmit="HandleValidSubmit">
             <div class="form-group">
                 <label for="emailInput">Email:</label>
@@ -31,7 +27,6 @@
         </EditForm>
     </div>
 </div>
-
 @if (!string.IsNullOrEmpty(user.Email))
 {
     <p>Your email: @user.Email</p>
@@ -48,17 +43,14 @@
 {
     <p>Your address: @user.Address</p>
 }
-
 @code {
     private User user = new User();
-
     private async Task HandleValidSubmit()
     {
         await DbContext.Users.AddAsync(user);
         await DbContext.SaveChangesAsync();
         Console.WriteLine($"Saved: {user.Email}, {user.Password}, {user.Phone}, {user.Address}");
     }
-
     [Inject]
     private AppDbContext DbContext { get; set; }
 }
