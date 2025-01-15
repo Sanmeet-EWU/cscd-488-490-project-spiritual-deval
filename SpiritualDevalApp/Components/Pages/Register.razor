@@ -1,31 +1,30 @@
 @page "/register"
 @using Microsoft.AspNetCore.Identity
 @using System.ComponentModel.DataAnnotations
-@using Microsoft.AspNetCore.Components.Forms
 @inject UserManager<IdentityUser> _userManager
 @inject NavigationManager _navigationManager
 
 <h3>Register</h3>
 
-<EditForm Model="registrationModel" OnValidSubmit="HandleRegister" FormName="registrationForm">
+<EditForm Model="registrationModel" OnValidSubmit="HandleRegister">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="form-group">
         <label for="Username">Username</label>
-        <InputText id="Username" class="form-control" @bind-Value="registrationModel.Username" />
+        <InputText id="Username" class="form-control" @bind="registrationModel.Username" />
     </div>
     <div class="form-group">
         <label for="Email">Email</label>
-        <InputText id="Email" class="form-control" @bind-Value="registrationModel.Email" />
+        <InputText id="Email" class="form-control" @bind="registrationModel.Email" />
     </div>
     <div class="form-group">
         <label for="Password">Password</label>
-        <InputText type="password" placeholder="Password" @bind-Value="registrationModel.Password" />
+        <InputPassword id="Password" class="form-control" @bind="registrationModel.Password" />
     </div>
     <div class="form-group">
         <label for="ConfirmPassword">Confirm Password</label>
-        <InputText type="password" placeholder="Password" class="form-control" @bind-Value="registrationModel.ConfirmPassword" />
+        <InputPassword id="ConfirmPassword" class="form-control" @bind="registrationModel.ConfirmPassword" />
     </div>
 
     <button type="submit" class="btn btn-primary">Register</button>
@@ -36,7 +35,6 @@
 
     private async Task HandleRegister()
     {
-        
         if (registrationModel.Password != registrationModel.ConfirmPassword)
         {
             Console.WriteLine("Passwords do not match.");
@@ -51,23 +49,30 @@
 
         var result = await _userManager.CreateAsync(user, registrationModel.Password);
 
-        //if (result.Succeeded)
-        
+        if (result.Succeeded)
+        {
             Console.WriteLine("Registration successful!");
-            //_navigationManager.NavigateTo("/login"); // Redirect to login page
-        
-        // Print values to the console when Register button is clicked
-        Console.WriteLine($"Username: {registrationModel.Username}");
-        Console.WriteLine($"Email: {registrationModel.Email}");
-        Console.WriteLine($"Password: {registrationModel.Password}");
-        Console.WriteLine($"ConfirmPassword: {registrationModel.ConfirmPassword}");
+            _navigationManager.NavigateTo("/login"); // Redirect to login page
+        }
+        else
+        {
+            foreach (var error in result.Errors)
+            {
+                Console.WriteLine($"Error: {error.Description}");
+            }
+        }
     }
 
     public class RegistrationModel
     {
+        [Required]
         public string Username { get; set; }
+        [Required]
+        [EmailAddress]
         public string Email { get; set; }
+        [Required]
         public string Password { get; set; }
+        [Required]
         public string ConfirmPassword { get; set; }
     }
 }
