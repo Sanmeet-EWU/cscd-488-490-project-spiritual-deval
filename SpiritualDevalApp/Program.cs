@@ -22,13 +22,9 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
-// Add services to the container.
+// Add services for Razor Components
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-
-// Add MVC or Razor Pages if needed
-builder.Services.AddRazorPages();
-builder.Services.AddControllersWithViews();
 
 // Add authorization policies
 builder.Services.AddAuthorization(options =>
@@ -51,7 +47,6 @@ app.UseStaticFiles();
 // Enable Authentication and Authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.UseAntiforgery();
 
 // Seed roles on startup
@@ -62,8 +57,6 @@ using (var scope = app.Services.CreateScope())
     {
         await roleManager.CreateAsync(new IdentityRole("Admin"));
     }
-
-    // Optionally seed an admin user here
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
     var adminUser = await userManager.FindByEmailAsync("admin@example.com");
     if (adminUser == null)
@@ -77,5 +70,8 @@ using (var scope = app.Services.CreateScope())
         await userManager.AddToRoleAsync(adminUser, "Admin");
     }
 }
+
+app.MapRazorComponents<App>()
+   .AddInteractiveServerRenderMode();
 
 app.Run();
