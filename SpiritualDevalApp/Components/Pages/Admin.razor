@@ -1,0 +1,6 @@
+@page "/admin"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Administrator")]
+
+<h3>Admin Page</h3>
+<p>Welcome, Administrator! This page is restricted to users with the 'Administrator' role.</p>

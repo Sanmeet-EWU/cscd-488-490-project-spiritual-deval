@@ -1,0 +1,62 @@
+@page "/Create"
+@layout MainLayout
+@rendermode InteractiveServer
+@using SpiritualDevalApp.Data
+@using Microsoft.AspNetCore.Identity
+@using SpiritualDevalApp.Models.Entities
+<PageTitle>Create Account</PageTitle>
+<h2>Enter your details</h2>
+<div class="create-account-container">
+    <div class="create-account-box">
+        <EditForm Model="user" OnValidSubmit="HandleValidSubmit">
+            <div class="form-group">
+                <label for="userNameInput">User Name:</label>
+                <InputText id="userNameInput" @bind-Value="user.UserName" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="passwordInput">Password:</label>
+                <InputText id="passwordInput" @bind-Value="user.Password" class="form-control" type="password" />
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </EditForm>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(user.UserName))
+{
+    <p>Your username: @user.UserName</p>
+}
+@if (!string.IsNullOrEmpty(user.Password))
+{
+    <p>Your password: @user.Password</p>
+}
+
+@code {
+
+    private User user = new User();
+
+    // Injecting DbContext and PasswordHasher
+    [Inject] 
+    private AppDbContext DbContext { get; set; } = null!;
+
+    [Inject]
+    private IPasswordHasher<User> PasswordHasher { get; set; } = null!;
+
+    private async Task HandleValidSubmit()
+    {
+        // Hash the password before storing it
+        var hashedPassword = PasswordHasher.HashPassword(user, user.Password);
+
+        var newUser = new UserAccount
+        {
+            UserName = user.UserName,
+            Password = hashedPassword,  // Store the hashed password
+            Role = "User"  // Default role
+        };
+
+        await DbContext.UserAccounts.AddAsync(newUser);
+        await DbContext.SaveChangesAsync();
+
+        Console.WriteLine($"Saved: {user.UserName}, {hashedPassword}");
+    }
+}
