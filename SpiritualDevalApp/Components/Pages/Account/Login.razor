@@ -1,9 +1,11 @@
 @page "/login"
 @using SpiritualDevalApp.Data
+@using SpiritualDevalApp.Models.Entities
 @using SpiritualDevalApp.Models.ViewModels
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Identity
 @inject AppDbContext appDbContext
 @inject NavigationManager navigationManager
 
@@ -44,13 +46,25 @@
 
     private string? errorMessage;
 
+    [Inject]
+    private IPasswordHasher<UserAccount> PasswordHasher { get; set; } = null!;
+
     private async Task Authenticate()
     {
         var userAccount = appDbContext.UserAccounts
             .Where(x => x.UserName == Model.UserName)
             .FirstOrDefault();
 
-        if (userAccount is null || userAccount.Password != Model.Password)
+        if (userAccount is null)
+        {
+            errorMessage = "Invalid User Name or Password";
+            return;
+        }
+
+        // Verify hashed password
+        var result = PasswordHasher.VerifyHashedPassword(userAccount, userAccount.Password, Model.Password);
+
+        if (result == PasswordVerificationResult.Failed)
         {
             errorMessage = "Invalid User Name or Password";
             return;
