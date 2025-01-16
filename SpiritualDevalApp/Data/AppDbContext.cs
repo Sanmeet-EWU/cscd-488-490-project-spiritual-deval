@@ -10,4 +10,6 @@ namespace SpiritualDevalApp.Data;
         }
 
         public DbSet<UserAccount> UserAccounts { get; set; }
+
+        public DbSet<Event> Events { get; set; }
     }
