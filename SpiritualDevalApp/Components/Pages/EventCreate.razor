@@ -45,8 +45,6 @@
         await DbContext.Events.AddAsync(eventModel);
         await DbContext.SaveChangesAsync();
 
-        // Optionally, redirect to another page or show a success message
-        // NavigationManager.NavigateTo("/admin/events");
     }
 
     [Inject]
