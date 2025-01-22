@@ -4,6 +4,7 @@
 @using SpiritualDevalApp.Data
 @using Microsoft.AspNetCore.Identity
 @using SpiritualDevalApp.Models.Entities
+
 <PageTitle>Create Account</PageTitle>
 <h2>Enter your details</h2>
 <div class="create-account-container">
@@ -59,12 +60,15 @@
 
     private User user = new User();
 
-    // Injecting DbContext and PasswordHasher
+    // Injecting DbContext, PasswordHasher, and NavigationManager
     [Inject] 
     private AppDbContext DbContext { get; set; } = null!;
 
     [Inject]
     private IPasswordHasher<User> PasswordHasher { get; set; } = null!;
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = null!;
 
     private async Task HandleValidSubmit()
     {
@@ -84,6 +88,7 @@
         await DbContext.UserAccounts.AddAsync(newUser);
         await DbContext.SaveChangesAsync();
 
-        Console.WriteLine($"Saved: {user.UserName}, {hashedPassword}");
+        // Redirect to the login page after successful account creation
+        NavigationManager.NavigateTo("/login");
     }
 }
