@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SpiritualDevalApp.Data;
 
@@ -11,9 +12,11 @@ using SpiritualDevalApp.Data;
 namespace SpiritualDevalApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250116083646_AddEvents")]
+    partial class AddEvents
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,21 +72,6 @@ namespace SpiritualDevalApp.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Email")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("email");
-
-                    b.Property<string>("FirstName")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("first_name");
-
-                    b.Property<string>("LastName")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("last_name");
-
                     b.Property<string>("Password")
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)")
@@ -101,7 +89,7 @@ namespace SpiritualDevalApp.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserAccounts");
+                    b.ToTable("user_account");
                 });
 #pragma warning restore 612, 618
         }

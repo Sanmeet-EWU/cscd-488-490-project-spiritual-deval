@@ -1,10 +1,11 @@
-
 @page "/admin/event/create"
 @layout MainLayout
 @rendermode InteractiveServer
+@using SpiritualDevalApp.Models.Entities
+@using SpiritualDevalApp.Data
+
 <h3>Create New Event</h3>
 <EditForm Model="eventModel" OnValidSubmit="HandleValidSubmit">
-   
     <div class="form-group">
         <label for="EventTitle">Event Title</label>
         <InputText id="EventTitle" class="form-control" @bind-Value="eventModel.EventTitle" />
@@ -37,14 +38,15 @@
 </EditForm>
 @code {
     private Event eventModel = new Event();
+
     private async Task HandleValidSubmit()
     {
-        // Save the new event to the database
+        // Save the new SpiritualEvent to the database
         await DbContext.Events.AddAsync(eventModel);
         await DbContext.SaveChangesAsync();
-        // Optionally, redirect to another page or show a success message
-        // NavigationManager.NavigateTo("/admin/events");
+
     }
-     [Inject]
-    private AppDbContext DbContext { get; set; }
+
+    [Inject]
+    private AppDbContext DbContext { get; set; } 
 }

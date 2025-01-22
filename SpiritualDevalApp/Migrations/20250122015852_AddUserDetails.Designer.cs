@@ -5,14 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using SpiritualDevalApp.Data;
 
 #nullable disable
 
 namespace SpiritualDevalApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250113210540_AddEventTable")]
-    partial class AddEventTable
+    [Migration("20250122015852_AddUserDetails")]
+    partial class AddUserDetails
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,7 +25,7 @@ namespace SpiritualDevalApp.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("Event", b =>
+            modelBuilder.Entity("SpiritualDevalApp.Models.Entities.Event", b =>
                 {
                     b.Property<int>("EventId")
                         .ValueGeneratedOnAdd()
@@ -62,33 +63,48 @@ namespace SpiritualDevalApp.Migrations
                     b.ToTable("Events");
                 });
 
-            modelBuilder.Entity("User", b =>
+            modelBuilder.Entity("SpiritualDevalApp.Models.Entities.UserAccount", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("id");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("UserId"));
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("email");
+
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("first_name");
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("last_name");
 
                     b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("password");
 
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<string>("Role")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("role");
 
-                    b.HasKey("UserId");
+                    b.Property<string>("UserName")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("user_name");
 
-                    b.ToTable("Users");
+                    b.HasKey("Id");
+
+                    b.ToTable("UserAccounts");
                 });
 #pragma warning restore 612, 618
         }
