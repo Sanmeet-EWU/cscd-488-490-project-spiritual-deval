@@ -1,4 +1,17 @@
 ﻿@page "/"
+@using Microsoft.EntityFrameworkCore
+@using SpiritualDevalApp.Data
+@using SpiritualDevalApp.Models.Entities
+@inject AppDbContext DbContext
+
+@code {
+    private IEnumerable<Event>? Events;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Events = await DbContext.Events.ToListAsync();
+    }
+}
 
 <PageTitle>Home</PageTitle>
 
@@ -25,36 +38,31 @@
     </div>
 </div>
 
-
 <!-- Upcoming Events Section -->
 <div class="upcoming-events">
     <h2>Upcoming Events</h2>
-    <div class="event-card">
-        <div class="event-header">
-            <span class="event-title">Group Meditation</span>
-            <span class="event-date">12/26/24</span>
-        </div>
-        <p class="event-description">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-            Quia, quae. Lorem ipsum, dolor sit amet consectetur adipisicing elit. Commodi, deleniti.
-        </p>
-        <div class="event-actions">
-            <button class="btn-volunteer">Volunteer</button>
-            <button class="btn-register">Register</button>
-        </div>
-    </div>
-    <div class="event-card">
-        <div class="event-header">
-            <span class="event-title">Event 2</span>
-            <span class="event-date">Date</span>
-        </div>
-        <p class="event-description">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-            Quia, quae. Lorem ipsum, dolor sit amet consectetur adipisicing elit. Commodi, deleniti.
-        </p>
-        <div class="event-actions">
-            <button class="btn-volunteer">Volunteer</button>
-            <button class="btn-register">Register</button>
-        </div>
-    </div>
+    @if (Events != null && Events.Any())
+    {
+        foreach (var eventItem in Events)
+        {
+            <div class="event-card">
+                <div class="event-header">
+                    <span class="event-title">@eventItem.EventTitle</span>
+                    <span class="event-date">@eventItem.EventDate.ToString("MM/dd/yyyy")</span>
+                </div>
+                <p class="event-description">
+                    @eventItem.EventDescription
+                </p>
+                <div class="event-actions">
+                    <button class="btn-volunteer">Volunteer</button>
+                    <button class="btn-register">Register</button>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p>No upcoming events.</p>
+    }
 </div>
+
