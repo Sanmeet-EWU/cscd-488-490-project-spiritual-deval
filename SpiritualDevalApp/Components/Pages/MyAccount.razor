@@ -1,0 +1,92 @@
+@page "/my-account"
+@layout MainLayout
+@rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using SpiritualDevalApp.Data
+@using Microsoft.AspNetCore.Identity
+@using SpiritualDevalApp.Models.Entities
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AppDbContext DbContext
+@inject NavigationManager NavigationManager
+
+<PageTitle>Change Password</PageTitle>
+
+<h2>User Information</h2>
+@if (loggedInUser != null)
+{
+    <p><strong>First Name:</strong> @loggedInUser.FirstName</p>
+    <p><strong>Last Name:</strong> @loggedInUser.LastName</p>
+    <p><strong>Username:</strong> @loggedInUser.UserName</p>
+}
+else
+{
+    <p>Loading user information...</p>
+}
+
+<h2>Enter your new password</h2>
+<div class="create-account-container">
+    <div class="create-account-box">
+        <EditForm Model="user" OnValidSubmit="HandleValidSubmit">
+            <div class="form-group">
+                <label for="passwordInput">Password:</label>
+                <InputText id="passwordInput" @bind-Value="user.Password" class="form-control" type="password" />
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </EditForm>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(user.Password))
+{
+    <p>Your password: @user.Password</p>
+}
+
+@code {
+    private User user = new User();
+    private UserAccount? loggedInUser;
+
+    [CascadingParameter]
+    public HttpContext HttpContext { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Get the authenticated user
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userPrincipal = authState.User;
+
+        if (userPrincipal.Identity.IsAuthenticated)
+        {
+            var username = userPrincipal.Identity.Name;
+
+            // Fetch the logged-in user details
+            if (!string.IsNullOrEmpty(username))
+            {
+                loggedInUser = await DbContext.UserAccounts
+                    .FirstOrDefaultAsync(u => u.UserName == username);
+            }
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (loggedInUser != null)
+        {
+            // Hash the new password
+            var passwordHasher = new PasswordHasher<UserAccount>();
+            var hashedPassword = passwordHasher.HashPassword(loggedInUser, user.Password);
+            loggedInUser.Password = hashedPassword;
+
+            // Log the hashed password to the console
+            Console.WriteLine($"Hashed Password: {hashedPassword}");
+
+            // Update the user record in the database
+            DbContext.UserAccounts.Update(loggedInUser);
+            await DbContext.SaveChangesAsync();
+
+            // Redirect to the logout page
+            NavigationManager.NavigateTo("/logout", true);
+        }
+    }
+}
