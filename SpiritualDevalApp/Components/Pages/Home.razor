@@ -34,24 +34,28 @@
             <p>At Spiritual Deval, we offer a peaceful environment where you can embark on your spiritual journey, reflect, and connect with your higher self. Our teachings and practices are centered around mindfulness, inner peace, and personal growth.</p>
         </section>
 
-        <!-- Upcoming Events Section -->
-        <section class="events">
-            <h2>Upcoming Events</h2>
+
+      <!-- Upcoming Events Section -->
+<section class="events">
+    <h2>Upcoming Events</h2>
+    @if (Events != null && Events.Any())
+    {
+        foreach (var eventItem in Events)
+        {
             <div class="event-item">
-                <h3>Placeholder Event Title 1</h3>
-                <p><strong>Date:</strong> March 15, 2025</p>
-                <p>Event Description Placeholder - Brief overview of the upcoming event.</p>
+                <h3>@eventItem.EventTitle</h3>
+                <p><strong>Date:</strong> @eventItem.EventDate.ToString("MMMM d, yyyy")</p>
+                <p>@eventItem.EventDescription</p>
                 <a href="#" class="cta-button">Register</a>
                 <a href="#" class="cta-button">Volunteer</a>
             </div>
-            <div class="event-item">
-                <h3>Placeholder Event Title 2</h3>
-                <p><strong>Date:</strong> April 10, 2025</p>
-                <p>Event Description Placeholder - Brief overview of the upcoming event.</p>
-                <a href="#" class="cta-button">Register</a>
-                <a href="#" class="cta-button">Volunteer</a>
-            </div>
-        </section>
+        }
+    }
+    else
+    {
+        <p>No upcoming events.</p>
+    }
+</section>
 
         <!-- Past Events Section -->
         <section class="events">
@@ -90,35 +94,6 @@
         </footer>
     </div>
 </div>
-
-<!-- Upcoming Events Section -->
-<div class="upcoming-events">
-    <h2>Upcoming Events</h2>
-    @if (Events != null && Events.Any())
-    {
-        foreach (var eventItem in Events)
-        {
-            <div class="event-card">
-                <div class="event-header">
-                    <span class="event-title">@eventItem.EventTitle</span>
-                    <span class="event-date">@eventItem.EventDate.ToString("MM/dd/yyyy")</span>
-                </div>
-                <p class="event-description">
-                    @eventItem.EventDescription
-                </p>
-                <div class="event-actions">
-                    <button class="btn-volunteer">Volunteer</button>
-                    <button class="btn-register">Register</button>
-                </div>
-            </div>
-        }
-    }
-    else
-    {
-        <p>No upcoming events.</p>
-    }
-</div>
-
 
 
 <!-- CSS Styles -->
