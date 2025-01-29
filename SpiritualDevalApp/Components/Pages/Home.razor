@@ -1,4 +1,18 @@
-﻿@page "/" 
+@page "/"
+@using Microsoft.EntityFrameworkCore
+@using SpiritualDevalApp.Data
+@using SpiritualDevalApp.Models.Entities
+@using System.Security.Policy
+@inject AppDbContext DbContext
+
+@code {
+    private IEnumerable<Event>? Events;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Events = await DbContext.Events.ToListAsync();
+    }
+}
 
 <PageTitle>Home</PageTitle>
 
@@ -59,13 +73,13 @@
             <h3>Connect with Us</h3>
             <div class="social-icons">
                 <a href="https://facebook.com" target="_blank">
-                    <img src="https://cdn-icons-png.flaticon.com/256/124/124010.png" alt="Facebook" />
+                    <img src="/icons/Facebook_Logo_Primary.png" alt="Facebook" />
                 </a>
                 <a href="https://twitter.com" target="_blank">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/X_icon_2.svg/1483px-X_icon_2.svg.png" alt="Twitter" />
+                    <img src="/icons/logo-black.png" alt="X" />
                 </a>
                 <a href="https://instagram.com" target="_blank">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" />
+                    <img src="/icons/Instagram_Glyph_Gradient.png" alt="Instagram" />
                 </a>
             </div>
         </section>
@@ -76,6 +90,36 @@
         </footer>
     </div>
 </div>
+
+<!-- Upcoming Events Section -->
+<div class="upcoming-events">
+    <h2>Upcoming Events</h2>
+    @if (Events != null && Events.Any())
+    {
+        foreach (var eventItem in Events)
+        {
+            <div class="event-card">
+                <div class="event-header">
+                    <span class="event-title">@eventItem.EventTitle</span>
+                    <span class="event-date">@eventItem.EventDate.ToString("MM/dd/yyyy")</span>
+                </div>
+                <p class="event-description">
+                    @eventItem.EventDescription
+                </p>
+                <div class="event-actions">
+                    <button class="btn-volunteer">Volunteer</button>
+                    <button class="btn-register">Register</button>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p>No upcoming events.</p>
+    }
+</div>
+
+
 
 <!-- CSS Styles -->
 <style>
