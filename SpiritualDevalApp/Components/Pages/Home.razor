@@ -35,41 +35,48 @@
         </section>
 
 
-      <!-- Upcoming Events Section -->
-<section class="events">
-    <h2>Upcoming Events</h2>
-    @if (Events != null && Events.Any())
-    {
-        foreach (var eventItem in Events)
-        {
-            <div class="event-item">
-                <h3>@eventItem.EventTitle</h3>
-                <p><strong>Date:</strong> @eventItem.EventDate.ToString("MMMM d, yyyy")</p>
-                <p>@eventItem.EventDescription</p>
-                <a href="#" class="cta-button">Register</a>
-                <a href="#" class="cta-button">Volunteer</a>
-            </div>
-        }
-    }
-    else
-    {
-        <p>No upcoming events.</p>
-    }
-</section>
+        <!-- Upcoming Events Section -->
+        <section class="events">
+            <h2>Upcoming Events</h2>
+            @if (Events != null && Events.Any(e => e.EventDate >= DateTime.Today))
+            {
+                foreach (var eventItem in Events.Where(e => e.EventDate >= DateTime.Today))
+                {
+                    <div class="event-item">
+                        <h3>@eventItem.EventTitle</h3>
+                        <p><strong>Date:</strong> @eventItem.EventDate.ToString("MMMM d, yyyy")</p>
+                        <p>@eventItem.EventDescription</p>
+                        <a href="#" class="cta-button">Register</a>
+                        <a href="#" class="cta-button">Volunteer</a>
+                    </div>
+                }
+            }
+            else
+            {
+                <p>No upcoming events.</p>
+            }
+        </section>
 
         <!-- Past Events Section -->
         <section class="events">
             <h2>Past Events</h2>
-            <div class="event-item">
-                <h3>Placeholder Past Event Title 1</h3>
-                <p><strong>Date:</strong> January 10, 2025</p>
-                <p>Event Description Placeholder - Brief recap of the past event.</p>
-            </div>
-            <div class="event-item">
-                <h3>Placeholder Past Event Title 2</h3>
-                <p><strong>Date:</strong> February 5, 2025</p>
-                <p>Event Description Placeholder - Brief recap of the past event.</p>
-            </div>
+            @if (Events != null && Events.Any(e => e.EventDate < DateTime.Today))
+            {
+                foreach (var eventItem in Events.Where(e => e.EventDate < DateTime.Today))
+                {
+                    <div class="event-item">
+                        <h3>@eventItem.EventTitle</h3>
+                        <p><strong>Date:</strong> @eventItem.EventDate.ToString("MMMM d, yyyy")</p>
+                        <p>@eventItem.EventDescription</p>
+                        <a href="#" class="cta-button">Register</a>
+                        <a href="#" class="cta-button">Volunteer</a>
+                    </div>
+                }
+            }
+            else
+            {
+                <p>No upcoming events.</p>
+            }
         </section>
 
         <!-- Social Media Section -->
