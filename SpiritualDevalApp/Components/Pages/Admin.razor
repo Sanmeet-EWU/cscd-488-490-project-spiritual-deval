@@ -1,6 +1,51 @@
 @page "/admin"
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using SpiritualDevalApp.Data
+@using SpiritualDevalApp.Models.Entities
+@using System.Security.Policy
+@inject AppDbContext DbContext
 @attribute [Authorize(Roles = "Administrator")]
+
+@code {
+    private IEnumerable<UserAccount>? Users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Users = await DbContext.UserAccounts.ToListAsync();
+    }
+}
 
 <h3>Admin Page</h3>
 <p>Welcome, Administrator! This page is restricted to users with the 'Administrator' role.</p>
+
+
+<section class="Users">
+    <h2>List of Users</h2>
+    @if (Users != null && Users.Any())
+    {
+        <table border="1" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th style="padding: 10px; text-align: left;">Name</th>
+                    <th style="padding: 10px; text-align: left;">Username</th>
+                    <th style="padding: 10px; text-align: left;">Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Users)
+                {
+                    <tr>
+                        <td style="padding: 10px;">@user.FirstName @user.LastName</td>
+                        <td style="padding: 10px;">@user.UserName</td>
+                        <td style="padding: 10px;">@user.Email</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No upcoming Users.</p>
+    }
+</section>
