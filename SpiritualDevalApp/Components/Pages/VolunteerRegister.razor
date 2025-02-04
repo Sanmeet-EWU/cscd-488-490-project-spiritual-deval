@@ -1,0 +1,80 @@
+@page "/volunteer/register/{eventId:int}"
+@using Microsoft.EntityFrameworkCore
+@using SpiritualDevalApp.Data
+@using SpiritualDevalApp.Models.Entities
+@inject AppDbContext DbContext
+@inject AuthenticationStateProvider AuthProvider
+@rendermode InteractiveServer
+<PageTitle>Volunteer Registration</PageTitle>
+
+<h1>Volunteer for Event</h1>
+<p>Event ID: @EventId</p>
+
+<div>
+    <label for="skillsProvided">Skills Provided (optional):</label>
+    <textarea id="skillsProvided" @bind="SkillsProvided" class="form-control" rows="3"></textarea>
+</div>
+
+<button class="btn btn-primary" @onclick="RegisterAsVolunteer">Register as Volunteer</button>
+
+<p>@Message</p>
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    private string SkillsProvided { get; set; } = string.Empty;
+    private string Message { get; set; } = string.Empty;
+
+    private async Task RegisterAsVolunteer()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            // Get username from authentication state
+            var username = user.Identity.Name;
+
+            if (!string.IsNullOrEmpty(username))
+            {
+                // Fetch user details from the database
+                var loggedInUser = await DbContext.UserAccounts
+                    .FirstOrDefaultAsync(u => u.UserName == username);
+
+                if (loggedInUser != null)
+                {
+                    // Use the retrieved User ID
+                    var userId = loggedInUser.Id;
+
+                    // Create a new VolunteerRegistration record
+                    var volunteerRegistration = new VolunteerRegistration
+                    {
+                        UserId = userId,
+                        EventId = EventId,  // Use eventId from the URL
+                        RegistrationDate = DateTime.UtcNow,
+                        SkillsProvided = SkillsProvided // Store skills provided
+                    };
+
+                    // Add to the database and save
+                    DbContext.VolunteerRegistrations.Add(volunteerRegistration);
+                    await DbContext.SaveChangesAsync();
+
+                    Message = $"Successfully registered as a volunteer for event {EventId}! (User ID: {userId})";
+                }
+                else
+                {
+                    Message = "User account not found in the database.";
+                }
+            }
+            else
+            {
+                Message = "Username is missing from authentication state.";
+            }
+        }
+        else
+        {
+            Message = "You must be logged in to register as a volunteer.";
+        }
+    }
+}
