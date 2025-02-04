@@ -5,7 +5,7 @@
 @inject AppDbContext DbContext
 @inject AuthenticationStateProvider AuthProvider
 @rendermode InteractiveServer
-<PageTitle>Counter</PageTitle>
+<PageTitle>Event Registration</PageTitle>
 
 <h1>Register for Event</h1>
 <p>Event ID: @EventId</p>
@@ -38,9 +38,27 @@
 
                 if (loggedInUser != null)
                 {
-                    // Use the retrieved User ID
                     var userId = loggedInUser.Id;
 
+                    // Fetch event details
+                    var eventDetails = await DbContext.Events.FindAsync(EventId);
+                    if (eventDetails == null)
+                    {
+                        Message = "Event not found.";
+                        return;
+                    }
+
+                    // Check current participant count
+                    var currentParticipants = await DbContext.EventRegistrations
+                        .CountAsync(e => e.EventId == EventId);
+
+                    if (currentParticipants >= eventDetails.MaxParticipants)
+                    {
+                        Message = "This event has reached its maximum number of participants.";
+                        return;
+                    }
+
+                    // Register the user for the event
                     var registration = new EventRegistration
                     {
                         UserId = userId,

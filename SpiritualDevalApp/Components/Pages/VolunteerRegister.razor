@@ -33,30 +33,44 @@
 
         if (user.Identity?.IsAuthenticated == true)
         {
-            // Get username from authentication state
             var username = user.Identity.Name;
 
             if (!string.IsNullOrEmpty(username))
             {
-                // Fetch user details from the database
                 var loggedInUser = await DbContext.UserAccounts
                     .FirstOrDefaultAsync(u => u.UserName == username);
 
                 if (loggedInUser != null)
                 {
-                    // Use the retrieved User ID
                     var userId = loggedInUser.Id;
 
-                    // Create a new VolunteerRegistration record
+                    // Fetch event details
+                    var eventDetails = await DbContext.Events.FindAsync(EventId);
+                    if (eventDetails == null)
+                    {
+                        Message = "Event not found.";
+                        return;
+                    }
+
+                    // Check current volunteer count
+                    var currentVolunteers = await DbContext.VolunteerRegistrations
+                        .CountAsync(v => v.EventId == EventId);
+
+                    if (currentVolunteers >= eventDetails.VolunteersRequired)
+                    {
+                        Message = "Volunteer limit reached for this event.";
+                        return;
+                    }
+
+                    // Register the user as a volunteer
                     var volunteerRegistration = new VolunteerRegistration
                     {
                         UserId = userId,
-                        EventId = EventId,  // Use eventId from the URL
+                        EventId = EventId,
                         RegistrationDate = DateTime.UtcNow,
-                        SkillsProvided = SkillsProvided // Store skills provided
+                        SkillsProvided = SkillsProvided
                     };
 
-                    // Add to the database and save
                     DbContext.VolunteerRegistrations.Add(volunteerRegistration);
                     await DbContext.SaveChangesAsync();
 
