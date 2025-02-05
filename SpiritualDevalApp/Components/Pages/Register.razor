@@ -1,0 +1,89 @@
+@page "/register/{eventId:int}"
+@using Microsoft.EntityFrameworkCore
+@using SpiritualDevalApp.Data
+@using SpiritualDevalApp.Models.Entities
+@inject AppDbContext DbContext
+@inject AuthenticationStateProvider AuthProvider
+@rendermode InteractiveServer
+<PageTitle>Event Registration</PageTitle>
+
+<h1>Register for Event</h1>
+<p>Event ID: @EventId</p>
+
+<button class="btn btn-primary" @onclick="RegisterToEvent">Register</button>
+
+<p>@Message</p>
+
+@code {
+    [Parameter]
+    public int EventId { get; set; } // ✅ Keep eventId parameter from URL
+
+    private string Message { get; set; } = string.Empty;
+
+    private async Task RegisterToEvent()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            // Get username from authentication state
+            var username = user.Identity.Name;
+
+            if (!string.IsNullOrEmpty(username))
+            {
+                // Fetch user details from the database
+                var loggedInUser = await DbContext.UserAccounts
+                    .FirstOrDefaultAsync(u => u.UserName == username);
+
+                if (loggedInUser != null)
+                {
+                    var userId = loggedInUser.Id;
+
+                    // Fetch event details
+                    var eventDetails = await DbContext.Events.FindAsync(EventId);
+                    if (eventDetails == null)
+                    {
+                        Message = "Event not found.";
+                        return;
+                    }
+
+                    // Check current participant count
+                    var currentParticipants = await DbContext.EventRegistrations
+                        .CountAsync(e => e.EventId == EventId);
+
+                    if (currentParticipants >= eventDetails.MaxParticipants)
+                    {
+                        Message = "This event has reached its maximum number of participants.";
+                        return;
+                    }
+
+                    // Register the user for the event
+                    var registration = new EventRegistration
+                    {
+                        UserId = userId,
+                        EventId = EventId,  // ✅ Use eventId from the URL
+                        RegistrationDate = DateTime.UtcNow
+                    };
+
+                    DbContext.EventRegistrations.Add(registration);
+                    await DbContext.SaveChangesAsync();
+
+                    Message = $"Successfully registered for event {EventId}! (User ID: {userId})";
+                }
+                else
+                {
+                    Message = "User account not found in the database.";
+                }
+            }
+            else
+            {
+                Message = "Username is missing from authentication state.";
+            }
+        }
+        else
+        {
+            Message = "You must be logged in to register for an event.";
+        }
+    }
+}
