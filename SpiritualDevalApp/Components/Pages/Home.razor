@@ -46,8 +46,8 @@
                         <h3>@eventItem.EventTitle</h3>
                         <p><strong>Date:</strong> @eventItem.EventDate.ToString("MMMM d, yyyy")</p>
                         <p>@eventItem.EventDescription</p>
-                        <a href="#" class="cta-button">Register</a>
-                        <a href="#" class="cta-button">Volunteer</a>
+                        <button class="cta-button" onclick="location.href='/register/@eventItem.EventId'">Register</button>
+                        <button class="cta-button" onclick="location.href='/volunteer/register/@eventItem.EventId'">Volunteer</button>
                     </div>
                 }
             }
