@@ -5,17 +5,41 @@
 @inject AppDbContext DbContext
 @inject AuthenticationStateProvider AuthProvider
 @rendermode InteractiveServer
+
 <PageTitle>Volunteer Registration</PageTitle>
 
 <h1>Volunteer for Event</h1>
-<p>Event ID: @EventId</p>
 
-<div>
-    <label for="skillsProvided">Skills Provided (optional):</label>
-    <textarea id="skillsProvided" @bind="SkillsProvided" class="form-control" rows="3"></textarea>
-</div>
-
-<button class="btn btn-primary" @onclick="RegisterAsVolunteer">Register as Volunteer</button>
+@if (EventDetails != null)
+{
+    <div class="card">
+        <div class="card-body">
+            <h2>@EventDetails.EventTitle</h2>
+            <p><strong>Description:</strong> @EventDetails.EventDescription</p>
+            <p><strong>Date:</strong> @EventDetails.EventDate.ToString("f")</p>
+            <p><strong>Location:</strong> @EventDetails.EventLocation</p>
+            <p><strong>Volunteers Needed:</strong> @CurrentVolunteers / @EventDetails.VolunteersRequired</p>
+            <p><strong>Skills Required:</strong> @EventDetails.SkillsRequired</p>
+            
+            @if (CurrentVolunteers < EventDetails.VolunteersRequired)
+            {
+                <div>
+                    <label for="skillsProvided"><strong>Skills Provided (optional):</strong></label>
+                    <textarea id="skillsProvided" @bind="SkillsProvided" class="form-control" rows="3"></textarea>
+                </div>
+                <button class="btn btn-primary mt-2" @onclick="RegisterAsVolunteer">Register as Volunteer</button>
+            }
+            else
+            {
+                <p class="text-danger">Volunteer limit reached for this event.</p>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <p>Loading event details...</p>
+}
 
 <p>@Message</p>
 
@@ -23,8 +47,26 @@
     [Parameter]
     public int EventId { get; set; }
 
+    private Event? EventDetails { get; set; }
+    private int CurrentVolunteers { get; set; }
     private string SkillsProvided { get; set; } = string.Empty;
     private string Message { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEventDetails();
+    }
+
+    private async Task LoadEventDetails()
+    {
+        EventDetails = await DbContext.Events.FindAsync(EventId);
+
+        if (EventDetails != null)
+        {
+            CurrentVolunteers = await DbContext.VolunteerRegistrations
+                .CountAsync(v => v.EventId == EventId);
+        }
+    }
 
     private async Task RegisterAsVolunteer()
     {
@@ -44,25 +86,28 @@
                 {
                     var userId = loggedInUser.Id;
 
-                    // Fetch event details
-                    var eventDetails = await DbContext.Events.FindAsync(EventId);
-                    if (eventDetails == null)
+                    if (EventDetails == null)
                     {
                         Message = "Event not found.";
                         return;
                     }
 
-                    // Check current volunteer count
-                    var currentVolunteers = await DbContext.VolunteerRegistrations
-                        .CountAsync(v => v.EventId == EventId);
+                    // Check if user is already a volunteer
+                    var existingVolunteer = await DbContext.VolunteerRegistrations
+                        .AnyAsync(v => v.EventId == EventId && v.UserId == userId);
 
-                    if (currentVolunteers >= eventDetails.VolunteersRequired)
+                    if (existingVolunteer)
+                    {
+                        Message = "You are already registered as a volunteer for this event.";
+                        return;
+                    }
+
+                    if (CurrentVolunteers >= EventDetails.VolunteersRequired)
                     {
                         Message = "Volunteer limit reached for this event.";
                         return;
                     }
 
-                    // Register the user as a volunteer
                     var volunteerRegistration = new VolunteerRegistration
                     {
                         UserId = userId,
@@ -74,7 +119,10 @@
                     DbContext.VolunteerRegistrations.Add(volunteerRegistration);
                     await DbContext.SaveChangesAsync();
 
-                    Message = $"Successfully registered as a volunteer for event {EventId}! (User ID: {userId})";
+                    Message = $"Successfully registered as a volunteer for {EventDetails.EventTitle}!";
+                    
+                    // Refresh volunteer count
+                    CurrentVolunteers++;
                 }
                 else
                 {

@@ -5,20 +5,64 @@
 @inject AppDbContext DbContext
 @inject AuthenticationStateProvider AuthProvider
 @rendermode InteractiveServer
+
 <PageTitle>Event Registration</PageTitle>
 
 <h1>Register for Event</h1>
-<p>Event ID: @EventId</p>
 
-<button class="btn btn-primary" @onclick="RegisterToEvent">Register</button>
+@if (EventDetails != null)
+{
+    <div class="card">
+        <div class="card-body">
+            <h2>@EventDetails.EventTitle</h2>
+            <p><strong>Description:</strong> @EventDetails.EventDescription</p>
+            <p><strong>Date:</strong> @EventDetails.EventDate.ToString("f")</p>
+            <p><strong>Location:</strong> @EventDetails.EventLocation</p>
+            <p><strong>Participants:</strong> @CurrentParticipants / @EventDetails.MaxParticipants</p>
+            <p><strong>Volunteers Needed:</strong> @EventDetails.VolunteersRequired</p>
+            <p><strong>Skills Required:</strong> @EventDetails.SkillsRequired</p>
+            
+            @if (CurrentParticipants < EventDetails.MaxParticipants)
+            {
+                <button class="btn btn-primary" @onclick="RegisterToEvent">Register</button>
+            }
+            else
+            {
+                <p class="text-danger">This event is full.</p>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <p>Loading event details...</p>
+}
 
 <p>@Message</p>
 
 @code {
     [Parameter]
-    public int EventId { get; set; } // ✅ Keep eventId parameter from URL
+    public int EventId { get; set; }
 
+    private Event? EventDetails { get; set; }
+    private int CurrentParticipants { get; set; }
     private string Message { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEventDetails();
+    }
+
+    private async Task LoadEventDetails()
+    {
+        EventDetails = await DbContext.Events.FindAsync(EventId);
+
+        if (EventDetails != null)
+        {
+            CurrentParticipants = await DbContext.EventRegistrations
+                .CountAsync(e => e.EventId == EventId);
+        }
+    }
 
     private async Task RegisterToEvent()
     {
@@ -27,12 +71,10 @@
 
         if (user.Identity?.IsAuthenticated == true)
         {
-            // Get username from authentication state
             var username = user.Identity.Name;
 
             if (!string.IsNullOrEmpty(username))
             {
-                // Fetch user details from the database
                 var loggedInUser = await DbContext.UserAccounts
                     .FirstOrDefaultAsync(u => u.UserName == username);
 
@@ -40,36 +82,42 @@
                 {
                     var userId = loggedInUser.Id;
 
-                    // Fetch event details
-                    var eventDetails = await DbContext.Events.FindAsync(EventId);
-                    if (eventDetails == null)
+                    if (EventDetails == null)
                     {
                         Message = "Event not found.";
                         return;
                     }
 
-                    // Check current participant count
-                    var currentParticipants = await DbContext.EventRegistrations
-                        .CountAsync(e => e.EventId == EventId);
+                    // Check if the user is already registered
+                    var existingRegistration = await DbContext.EventRegistrations
+                        .AnyAsync(e => e.EventId == EventId && e.UserId == userId);
 
-                    if (currentParticipants >= eventDetails.MaxParticipants)
+                    if (existingRegistration)
+                    {
+                        Message = "You are already registered for this event.";
+                        return;
+                    }
+
+                    if (CurrentParticipants >= EventDetails.MaxParticipants)
                     {
                         Message = "This event has reached its maximum number of participants.";
                         return;
                     }
 
-                    // Register the user for the event
                     var registration = new EventRegistration
                     {
                         UserId = userId,
-                        EventId = EventId,  // ✅ Use eventId from the URL
+                        EventId = EventId,
                         RegistrationDate = DateTime.UtcNow
                     };
 
                     DbContext.EventRegistrations.Add(registration);
                     await DbContext.SaveChangesAsync();
 
-                    Message = $"Successfully registered for event {EventId}! (User ID: {userId})";
+                    Message = $"Successfully registered for event {EventDetails.EventTitle}!";
+                    
+                    // Refresh participant count
+                    CurrentParticipants++;
                 }
                 else
                 {
