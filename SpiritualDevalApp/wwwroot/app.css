@@ -49,3 +49,31 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+=======
+
+/* Center the form container on the page */
+.form-container {
+    max-width: 400px;
+    margin: auto;
+    margin-top: 10%;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+    text-align: center;
+}
+
+/* Ensure form inputs and buttons are spaced */
+.form-container .form-group {
+    margin-bottom: 15px;
+}
+
+.form-container button {
+    width: 100%;
+}
+>>>>>>> main
+>>>>>>> Stashed changes
