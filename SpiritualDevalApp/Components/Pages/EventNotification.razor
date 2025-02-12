@@ -1,0 +1,29 @@
+@page "/event-notification"
+@inject GmailServiceHelper GmailServiceHelper
+
+<h3>Send Event Notification</h3>
+<button @onclick="SendNotification">Send Notification</button>
+
+@code {
+    private async Task SendNotification()
+    {
+        Console.WriteLine("Sending email..."); // Log to browser console
+
+        string email = "member@example.com"; // Replace with the member's email
+        string subject = "Upcoming Temple Event";
+        string message = "Dear Member,<br><br>We are excited to invite you to our upcoming event...";
+
+        try
+        {
+            // Attempt to send the email
+            await GmailServiceHelper.SendEmailAsync(email, subject, message);
+            Console.WriteLine("Email sent successfully!"); // Log success
+        }
+        catch (Exception ex)
+        {
+            // Log any errors that occur
+            Console.WriteLine($"Error sending email: {ex.Message}");
+        }
+    }
+}
+
