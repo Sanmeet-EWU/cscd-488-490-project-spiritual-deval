@@ -1,0 +1,137 @@
+@page "/register/{eventId:int}"
+@using Microsoft.EntityFrameworkCore
+@using SpiritualDevalApp.Data
+@using SpiritualDevalApp.Models.Entities
+@inject AppDbContext DbContext
+@inject AuthenticationStateProvider AuthProvider
+@rendermode InteractiveServer
+
+<PageTitle>Event Registration</PageTitle>
+
+<h1>Register for Event</h1>
+
+@if (EventDetails != null)
+{
+    <div class="card">
+        <div class="card-body">
+            <h2>@EventDetails.EventTitle</h2>
+            <p><strong>Description:</strong> @EventDetails.EventDescription</p>
+            <p><strong>Date:</strong> @EventDetails.EventDate.ToString("f")</p>
+            <p><strong>Location:</strong> @EventDetails.EventLocation</p>
+            <p><strong>Participants:</strong> @CurrentParticipants / @EventDetails.MaxParticipants</p>
+            <p><strong>Volunteers Needed:</strong> @EventDetails.VolunteersRequired</p>
+            <p><strong>Skills Required:</strong> @EventDetails.SkillsRequired</p>
+            
+            @if (CurrentParticipants < EventDetails.MaxParticipants)
+            {
+                <button class="btn btn-primary" @onclick="RegisterToEvent">Register</button>
+            }
+            else
+            {
+                <p class="text-danger">This event is full.</p>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <p>Loading event details...</p>
+}
+
+<p>@Message</p>
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    private Event? EventDetails { get; set; }
+    private int CurrentParticipants { get; set; }
+    private string Message { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEventDetails();
+    }
+
+    private async Task LoadEventDetails()
+    {
+        EventDetails = await DbContext.Events.FindAsync(EventId);
+
+        if (EventDetails != null)
+        {
+            CurrentParticipants = await DbContext.EventRegistrations
+                .CountAsync(e => e.EventId == EventId);
+        }
+    }
+
+    private async Task RegisterToEvent()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            var username = user.Identity.Name;
+
+            if (!string.IsNullOrEmpty(username))
+            {
+                var loggedInUser = await DbContext.UserAccounts
+                    .FirstOrDefaultAsync(u => u.UserName == username);
+
+                if (loggedInUser != null)
+                {
+                    var userId = loggedInUser.Id;
+
+                    if (EventDetails == null)
+                    {
+                        Message = "Event not found.";
+                        return;
+                    }
+
+                    // Check if the user is already registered
+                    var existingRegistration = await DbContext.EventRegistrations
+                        .AnyAsync(e => e.EventId == EventId && e.UserId == userId);
+
+                    if (existingRegistration)
+                    {
+                        Message = "You are already registered for this event.";
+                        return;
+                    }
+
+                    if (CurrentParticipants >= EventDetails.MaxParticipants)
+                    {
+                        Message = "This event has reached its maximum number of participants.";
+                        return;
+                    }
+
+                    var registration = new EventRegistration
+                    {
+                        UserId = userId,
+                        EventId = EventId,
+                        RegistrationDate = DateTime.UtcNow
+                    };
+
+                    DbContext.EventRegistrations.Add(registration);
+                    await DbContext.SaveChangesAsync();
+
+                    Message = $"Successfully registered for event {EventDetails.EventTitle}!";
+                    
+                    // Refresh participant count
+                    CurrentParticipants++;
+                }
+                else
+                {
+                    Message = "User account not found in the database.";
+                }
+            }
+            else
+            {
+                Message = "Username is missing from authentication state.";
+            }
+        }
+        else
+        {
+            Message = "You must be logged in to register for an event.";
+        }
+    }
+}

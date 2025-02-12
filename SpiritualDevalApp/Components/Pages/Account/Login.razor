@@ -1,0 +1,88 @@
+@page "/login"
+@using SpiritualDevalApp.Data
+@using SpiritualDevalApp.Models.Entities
+@using SpiritualDevalApp.Models.ViewModels
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Identity
+@inject AppDbContext appDbContext
+@inject NavigationManager navigationManager
+
+<div class="row">
+    <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border">
+        <EditForm Model="@Model" OnValidSubmit="Authenticate" FormName="LoginForm">
+            <DataAnnotationsValidator />
+            <div class="mb-3 text-center flex-column">
+                <img src="/images/avatar.png" style="max-height:5rem;" />
+                <h3>LOGIN</h3>
+            </div>
+            <div class="mb-3">
+                <label>User Name</label>
+                <InputText @bind-Value="Model.UserName" class="form-control" placeholder="Username" />
+                <ValidationMessage For="() => Model.UserName" />
+            </div>
+            <div class="mb-3">
+                <label>Password</label>
+                <InputText @bind-Value="Model.Password" placeholder="Password" type="password" class="form-control" />
+                <ValidationMessage For="() => Model.Password" />
+            </div>
+            <div class="mb-3 text-center">
+                <span class="text-danger">@errorMessage</span>
+            </div>
+            <div class="mb-3 d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+        </EditForm>
+        <div class="mt-3 text-center">
+            <p>Don't have an account? <NavLink href="/CreateAccount">Create one</NavLink></p>
+        </div>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+    [SupplyParameterFromForm]
+    public LoginViewModel Model { get; set; } = new();
+
+    private string? errorMessage;
+
+    [Inject]
+    private IPasswordHasher<UserAccount> PasswordHasher { get; set; } = null!;
+
+    private async Task Authenticate()
+    {
+        var userAccount = appDbContext.UserAccounts
+            .Where(x => x.UserName == Model.UserName)
+            .FirstOrDefault();
+
+        if (userAccount is null)
+        {
+            errorMessage = "Invalid User Name or Password";
+            return;
+        }
+
+        // Verify hashed password
+        var result = PasswordHasher.VerifyHashedPassword(userAccount, userAccount.Password, Model.Password);
+
+        if (result == PasswordVerificationResult.Failed)
+        {
+            errorMessage = "Invalid User Name or Password";
+            return;
+        }
+
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, Model.UserName),
+            new Claim(ClaimTypes.Role, userAccount.Role)
+        };
+
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+        await HttpContext.SignInAsync(principal);
+
+        navigationManager.NavigateTo("/");
+    }
+}
