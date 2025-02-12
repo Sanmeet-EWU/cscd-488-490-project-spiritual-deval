@@ -8,44 +8,131 @@
 @attribute [Authorize(Roles = "Administrator")]
 
 @code {
-    private IEnumerable<UserAccount>? Users;
+    private IEnumerable<Event>? UpcomingEvents;
+    private IEnumerable<Event>? PastEvents;
+    private Dictionary<int, List<UserAccount>> RegisteredUsersByEvent = new();
 
     protected override async Task OnInitializedAsync()
     {
-        Users = await DbContext.UserAccounts.ToListAsync();
+        var currentDate = DateTime.Now;
+        UpcomingEvents = await DbContext.Events
+            .Where(e => e.EventDate >= currentDate)
+            .OrderBy(e => e.EventDate)
+            .ToListAsync();
+
+        PastEvents = await DbContext.Events
+            .Where(e => e.EventDate < currentDate)
+            .OrderByDescending(e => e.EventDate)
+            .ToListAsync();
+
+        await LoadRegisteredUsers();
+    }
+
+    private async Task LoadRegisteredUsers()
+    {
+        var registrations = await DbContext.EventRegistrations
+            .Include(er => er.User)
+            .ToListAsync();
+
+        RegisteredUsersByEvent = registrations
+            .GroupBy(er => er.EventId)
+            .ToDictionary(g => g.Key, g => g.Select(er => er.User).ToList());
     }
 }
 
 <h3>Admin Page</h3>
 <p>Welcome, Administrator! This page is restricted to users with the 'Administrator' role.</p>
 
-
-<section class="Users">
-    <h2>List of Users</h2>
-    @if (Users != null && Users.Any())
+<section class="Events">
+    <h2>Upcoming Events</h2>
+    @if (UpcomingEvents != null && UpcomingEvents.Any())
     {
-        <table border="1" style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr>
-                    <th style="padding: 10px; text-align: left;">Name</th>
-                    <th style="padding: 10px; text-align: left;">Username</th>
-                    <th style="padding: 10px; text-align: left;">Email</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var user in Users)
-                {
-                    <tr>
-                        <td style="padding: 10px;">@user.FirstName @user.LastName</td>
-                        <td style="padding: 10px;">@user.UserName</td>
-                        <td style="padding: 10px;">@user.Email</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <ul>
+            @foreach (var eventItem in UpcomingEvents)
+            {
+                <li>
+                    <details>
+                        <summary>@eventItem.EventTitle</summary>
+                        @if (RegisteredUsersByEvent.TryGetValue(eventItem.EventId, out var users) && users.Any())
+                        {
+                            <table border="1" style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr>
+                                        <th style="padding: 10px; text-align: left;">Name</th>
+                                        <th style="padding: 10px; text-align: left;">Username</th>
+                                        <th style="padding: 10px; text-align: left;">Email</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var user in users)
+                                    {
+                                        <tr>
+                                            <td style="padding: 10px;">@user.FirstName @user.LastName</td>
+                                            <td style="padding: 10px;">@user.UserName</td>
+                                            <td style="padding: 10px;">@user.Email</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <p>No users registered for this event.</p>
+                        }
+                    </details>
+                </li>
+            }
+        </ul>
     }
     else
     {
-        <p>No upcoming Users.</p>
+        <p>No upcoming events.</p>
+    }
+</section>
+
+<section class="Events">
+    <h2>Past Events</h2>
+    @if (PastEvents != null && PastEvents.Any())
+    {
+        <ul>
+            @foreach (var eventItem in PastEvents)
+            {
+                <li>
+                    <details>
+                        <summary>@eventItem.EventTitle</summary>
+                        @if (RegisteredUsersByEvent.TryGetValue(eventItem.EventId, out var users) && users.Any())
+                        {
+                            <table border="1" style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr>
+                                        <th style="padding: 10px; text-align: left;">Name</th>
+                                        <th style="padding: 10px; text-align: left;">Username</th>
+                                        <th style="padding: 10px; text-align: left;">Email</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var user in users)
+                                    {
+                                        <tr>
+                                            <td style="padding: 10px;">@user.FirstName @user.LastName</td>
+                                            <td style="padding: 10px;">@user.UserName</td>
+                                            <td style="padding: 10px;">@user.Email</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <p>No users registered for this event.</p>
+                        }
+                    </details>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>No past events.</p>
     }
 </section>
