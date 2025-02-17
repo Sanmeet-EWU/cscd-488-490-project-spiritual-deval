@@ -1,0 +1,51 @@
+@page "/Mail"
+@using System.Net.Mail;
+@using System;
+@using System.Net;
+@layout MainLayout
+@rendermode InteractiveServer
+<PageTitle>Login</PageTitle>
+
+<h2>Login</h2>
+
+<button type="button" class="btn btn-primary" @onclick="SendMail">Send Mail</button>
+
+<span style="font-weight:bold;">@Message</span>
+  
+
+@code {
+    private string Message { get; set; } = "";
+
+    private void SendMail()
+    {
+        Console.WriteLine("Send button clicked");
+    
+        Message = "Button clicked!";
+        StateHasChanged(); // This ensures the page re-renders to show the new message
+
+        try
+        {
+            Console.WriteLine("SendMail method triggered");
+            using (MailMessage mail = new MailMessage())
+            {
+                mail.From = new MailAddress("spiritualdeval@gmail.com");
+                mail.To.Add("elvicky916@gmail.com");
+                mail.Subject = "Sending Mail Testing 3 (Blazor)";
+                mail.Body = "<h1>This is mail body</h1>"; 
+                mail.IsBodyHtml = true;
+
+                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587)) 
+                {
+                    smtp.Credentials = new System.Net.NetworkCredential("spiritualdeval@gmail.com", "ixqieyynjgnnlxyn");
+                    smtp.EnableSsl = true;
+                    smtp.Send(mail);
+                    Message = "Mail Sent"; // Update message after email is sent
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Message = $"Error: {ex.Message}"; 
+        }
+    }
+}
