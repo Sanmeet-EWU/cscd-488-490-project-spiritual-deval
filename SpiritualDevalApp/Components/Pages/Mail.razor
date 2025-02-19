@@ -1,0 +1,62 @@
+@page "/Mail"
+@using System.Net.Mail;
+@using System;
+@using System.Net;
+@layout MainLayout
+@rendermode InteractiveServer
+
+<PageTitle>Send Mail</PageTitle>
+
+<h2>Send Mail</h2>
+
+<div>
+    <label>Email Title:</label>
+    <input type="text" @bind="EmailTitle" class="form-control" />
+</div>
+<div>
+    <label>Email Body:</label>
+    <textarea @bind="EmailBody" class="form-control"></textarea>
+</div>
+
+<button type="button" class="btn btn-primary mt-2" @onclick="SendMail">Send Mail</button>
+
+<span style="font-weight:bold;">@Message</span>
+
+@code {
+    private string EmailTitle { get; set; } = "";
+    private string EmailBody { get; set; } = "";
+    private string Message { get; set; } = "";
+
+    private void SendMail()
+    {
+        Console.WriteLine("Send button clicked");
+
+        Message = "Button clicked!";
+        StateHasChanged(); // Ensures UI updates
+
+        try
+        {
+            Console.WriteLine("SendMail method triggered");
+            using (MailMessage mail = new MailMessage())
+            {
+                mail.From = new MailAddress("spiritualdeval@gmail.com");
+                mail.To.Add("elvicky916@gmail.com");
+                mail.Subject = EmailTitle;
+                mail.Body = EmailBody;
+                mail.IsBodyHtml = false; // Sends the email as plain text
+
+                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587)) 
+                {
+                    smtp.Credentials = new NetworkCredential("spiritualdeval@gmail.com", "ixqieyynjgnnlxyn");
+                    smtp.EnableSsl = true;
+                    smtp.Send(mail);
+                    Message = "Mail Sent"; 
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Message = $"Error: {ex.Message}";
+        }
+    }
+}
