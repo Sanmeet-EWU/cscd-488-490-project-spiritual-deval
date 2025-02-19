@@ -11,37 +11,84 @@
 @inject AppDbContext DbContext
 @inject NavigationManager NavigationManager
 
-<PageTitle>Change Password</PageTitle>
+<PageTitle>My Account</PageTitle>
 
-<h2>User Information</h2>
-@if (loggedInUser != null)
-{
-    <p><strong>First Name:</strong> @loggedInUser.FirstName</p>
-    <p><strong>Last Name:</strong> @loggedInUser.LastName</p>
-    <p><strong>Username:</strong> @loggedInUser.UserName</p>
-}
-else
-{
-    <p>Loading user information...</p>
-}
+<h1 class="header-text">My Account</h1>
 
-<h2>Enter your new password</h2>
-<div class="create-account-container">
-    <div class="create-account-box">
+<div class="account-container">
+    <div class="account-box">
+        <h2>User Information</h2>
+        @if (loggedInUser != null)
+        {
+            <p><strong>First Name:</strong> @loggedInUser.FirstName</p>
+            <p><strong>Last Name:</strong> @loggedInUser.LastName</p>
+            <p><strong>Username:</strong> @loggedInUser.UserName</p>
+        }
+        else
+        {
+            <p>Loading user information...</p>
+        }
+    </div>
+
+    <div class="account-box">
+        <h2>Change Password</h2>
         <EditForm Model="user" OnValidSubmit="HandleValidSubmit">
             <div class="form-group">
-                <label for="passwordInput">Password:</label>
+                <label for="passwordInput">New Password:</label>
                 <InputText id="passwordInput" @bind-Value="user.Password" class="form-control" type="password" />
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="cta-button">Update Password</button>
         </EditForm>
     </div>
 </div>
 
-@if (!string.IsNullOrEmpty(user.Password))
-{
-    <p>Your password: @user.Password</p>
-}
+<style>
+    .header-text {
+        text-align: center;
+        font-size: 2em;
+        color: #556b2f;
+        font-family: 'Georgia', 'Times New Roman', serif;
+        margin: 50px 0 20px;
+    }
+
+    .account-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        max-width: 600px;
+        margin: auto;
+    }
+
+    .account-box {
+        width: 100%;
+        padding: 20px;
+        background-color: #f4f4f4;
+        border-radius: 8px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .cta-button {
+        display: block;
+        width: 100%;
+        background-color: #4f7c5d;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .cta-button:hover {
+        background-color: #3e654a;
+    }
+</style>
 
 @code {
     private User user = new User();
@@ -52,19 +99,15 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        // Get the authenticated user
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var userPrincipal = authState.User;
 
         if (userPrincipal.Identity.IsAuthenticated)
         {
             var username = userPrincipal.Identity.Name;
-
-            // Fetch the logged-in user details
             if (!string.IsNullOrEmpty(username))
             {
-                loggedInUser = await DbContext.UserAccounts
-                    .FirstOrDefaultAsync(u => u.UserName == username);
+                loggedInUser = await DbContext.UserAccounts.FirstOrDefaultAsync(u => u.UserName == username);
             }
         }
     }
@@ -73,19 +116,12 @@ else
     {
         if (loggedInUser != null)
         {
-            // Hash the new password
             var passwordHasher = new PasswordHasher<UserAccount>();
             var hashedPassword = passwordHasher.HashPassword(loggedInUser, user.Password);
             loggedInUser.Password = hashedPassword;
-
-            // Log the hashed password to the console
             Console.WriteLine($"Hashed Password: {hashedPassword}");
-
-            // Update the user record in the database
             DbContext.UserAccounts.Update(loggedInUser);
             await DbContext.SaveChangesAsync();
-
-            // Redirect to the logout page
             NavigationManager.NavigateTo("/logout", true);
         }
     }
