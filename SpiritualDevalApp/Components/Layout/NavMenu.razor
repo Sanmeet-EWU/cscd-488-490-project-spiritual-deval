@@ -3,46 +3,46 @@
 
 <nav class="nav-bar">
     <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> <nl2>Home</nl2>
     </NavLink>
 
     <NavLink class="nav-link" href="about">
-        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> About
+        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> <nl2>About</nl2>
     </NavLink>
 
     <NavLink class="nav-link" href="donation">
-        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Donation
+        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> <nl2>Donation</nl2>
     </NavLink>
 
     <NavLink class="nav-link" href="volunteer">
-        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Volunteer
+        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> <nl2>Volunteer</nl2>
     </NavLink>
 
     <NavLink class="nav-link" href="contact">
-        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Contact
+        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> <nl2>Contact</nl2>
     </NavLink>
 
     @if (isAuthenticated)
     {
         <NavLink class="nav-link" href="my-account">
-            <span class="bi bi-person-circle-nav-menu" aria-hidden="true"></span> My Account
+            <span class="bi bi-person-circle-nav-menu" aria-hidden="true"></span> <nl2>My Account</nl2>
         </NavLink>
 
         @if (isAdmin)
         {
             <NavLink class="nav-link" href="admin">
-                <span class="bi bi-gear-fill-nav-menu" aria-hidden="true"></span> Admin
+                <span class="bi bi-gear-fill-nav-menu" aria-hidden="true"></span> <nl2>Admin</nl2>
             </NavLink>
         }
 
         <NavLink class="nav-link" href="logout">
-            <span class="bi bi-box-arrow-right-nav-menu" aria-hidden="true"></span> Logout
+            <span class="bi bi-box-arrow-right-nav-menu" aria-hidden="true"></span> <nl2>Logout</nl2>
         </NavLink>
     }
     else
     {
         <NavLink class="nav-link" href="login">
-            <span class="bi bi-box-arrow-in-right-nav-menu" aria-hidden="true"></span> Login
+            <span class="bi bi-box-arrow-in-right-nav-menu" aria-hidden="true"></span> <nl2>Login</nl2>
         </NavLink>
     }
 </nav>
