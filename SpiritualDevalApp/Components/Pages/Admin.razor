@@ -40,14 +40,14 @@
     }
 }
 
-<h3>Admin Page</h3>
-<p>Welcome, Administrator! This page is restricted to users with the 'Administrator' role.</p>
+<h1 class="header-text">Admin Dashboard</h1>
+<p class="intro-text">Welcome, Administrator! Manage events and view registered users.</p>
 
-<section class="Events">
+<div class="admin-section">
     <h2>Upcoming Events</h2>
     @if (UpcomingEvents != null && UpcomingEvents.Any())
     {
-        <ul>
+        <ul class="event-list">
             @foreach (var eventItem in UpcomingEvents)
             {
                 <li>
@@ -55,21 +55,21 @@
                         <summary>@eventItem.EventTitle</summary>
                         @if (RegisteredUsersByEvent.TryGetValue(eventItem.EventId, out var users) && users.Any())
                         {
-                            <table border="1" style="width: 100%; border-collapse: collapse;">
+                            <table class="event-table">
                                 <thead>
                                     <tr>
-                                        <th style="padding: 10px; text-align: left;">Name</th>
-                                        <th style="padding: 10px; text-align: left;">Username</th>
-                                        <th style="padding: 10px; text-align: left;">Email</th>
+                                        <th>Name</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var user in users)
                                     {
                                         <tr>
-                                            <td style="padding: 10px;">@user.FirstName @user.LastName</td>
-                                            <td style="padding: 10px;">@user.UserName</td>
-                                            <td style="padding: 10px;">@user.Email</td>
+                                            <td>@user.FirstName @user.LastName</td>
+                                            <td>@user.UserName</td>
+                                            <td>@user.Email</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -88,13 +88,13 @@
     {
         <p>No upcoming events.</p>
     }
-</section>
+</div>
 
-<section class="Events">
+<div class="admin-section">
     <h2>Past Events</h2>
     @if (PastEvents != null && PastEvents.Any())
     {
-        <ul>
+        <ul class="event-list">
             @foreach (var eventItem in PastEvents)
             {
                 <li>
@@ -102,21 +102,21 @@
                         <summary>@eventItem.EventTitle</summary>
                         @if (RegisteredUsersByEvent.TryGetValue(eventItem.EventId, out var users) && users.Any())
                         {
-                            <table border="1" style="width: 100%; border-collapse: collapse;">
+                            <table class="event-table">
                                 <thead>
                                     <tr>
-                                        <th style="padding: 10px; text-align: left;">Name</th>
-                                        <th style="padding: 10px; text-align: left;">Username</th>
-                                        <th style="padding: 10px; text-align: left;">Email</th>
+                                        <th>Name</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var user in users)
                                     {
                                         <tr>
-                                            <td style="padding: 10px;">@user.FirstName @user.LastName</td>
-                                            <td style="padding: 10px;">@user.UserName</td>
-                                            <td style="padding: 10px;">@user.Email</td>
+                                            <td>@user.FirstName @user.LastName</td>
+                                            <td>@user.UserName</td>
+                                            <td>@user.Email</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -135,4 +135,63 @@
     {
         <p>No past events.</p>
     }
-</section>
+</div>
+
+<style>
+    .header-text {
+        text-align: center;
+        font-size: 2em;
+        color: #556b2f;
+        font-family: 'Georgia', serif;
+        margin: 50px 0 20px;
+    }
+
+    .intro-text {
+        text-align: center;
+        margin: 20px auto;
+        max-width: 600px;
+    }
+
+    .admin-section {
+        margin: 40px auto;
+        max-width: 800px;
+        padding: 20px;
+        background-color: #f4f4f4;
+        border-radius: 8px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .admin-section h2 {
+        font-size: 1.8em;
+        color: #4f7c5d;
+    }
+
+    .event-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .event-list details {
+        background: white;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 10px;
+    }
+
+    .event-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    .event-table th, .event-table td {
+        padding: 10px;
+        border: 1px solid #ccc;
+    }
+
+    .event-table th {
+        background-color: #4f7c5d;
+        color: white;
+    }
+</style>
