@@ -3,7 +3,6 @@
 @using Microsoft.EntityFrameworkCore
 @using SpiritualDevalApp.Data
 @using SpiritualDevalApp.Models.Entities
-@using System.Security.Policy
 @inject AppDbContext DbContext
 @attribute [Authorize(Roles = "Administrator")]
 
@@ -11,6 +10,7 @@
     private IEnumerable<Event>? UpcomingEvents;
     private IEnumerable<Event>? PastEvents;
     private Dictionary<int, List<UserAccount>> RegisteredUsersByEvent = new();
+    private Dictionary<int, List<UserAccount>> VolunteersByEvent = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -26,6 +26,7 @@
             .ToListAsync();
 
         await LoadRegisteredUsers();
+        await LoadVolunteers();
     }
 
     private async Task LoadRegisteredUsers()
@@ -38,10 +39,20 @@
             .GroupBy(er => er.EventId)
             .ToDictionary(g => g.Key, g => g.Select(er => er.User).ToList());
     }
+
+    private async Task LoadVolunteers()
+    {
+        var volunteers = await DbContext.VolunteerRegistrations
+            .Include(vr => vr.User)
+            .ToListAsync();
+
+        VolunteersByEvent = volunteers
+            .GroupBy(vr => vr.EventId)
+            .ToDictionary(g => g.Key, g => g.Select(vr => vr.User).ToList());
+    }
 }
 
-<h3>Admin Page</h3>
-<p>Welcome, Administrator! This page is restricted to users with the 'Administrator' role.</p>
+<h1>Event Management</h1>
 
 <section class="Events">
     <h2>Upcoming Events</h2>
@@ -53,32 +64,63 @@
                 <li>
                     <details>
                         <summary>@eventItem.EventTitle</summary>
-                        @if (RegisteredUsersByEvent.TryGetValue(eventItem.EventId, out var users) && users.Any())
-                        {
-                            <table border="1" style="width: 100%; border-collapse: collapse;">
-                                <thead>
-                                    <tr>
-                                        <th style="padding: 10px; text-align: left;">Name</th>
-                                        <th style="padding: 10px; text-align: left;">Username</th>
-                                        <th style="padding: 10px; text-align: left;">Email</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var user in users)
-                                    {
+
+                        <details>
+                            <summary>Registered Users</summary>
+                            @if (RegisteredUsersByEvent.TryGetValue(eventItem.EventId, out var users) && users.Any())
+                            {
+                                <table>
+                                    <thead>
                                         <tr>
-                                            <td style="padding: 10px;">@user.FirstName @user.LastName</td>
-                                            <td style="padding: 10px;">@user.UserName</td>
-                                            <td style="padding: 10px;">@user.Email</td>
+                                            <th>Name</th>
+                                            <th>Email</th>
                                         </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        }
-                        else
-                        {
-                            <p>No users registered for this event.</p>
-                        }
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var user in users)
+                                        {
+                                            <tr>
+                                                <td>@user.FirstName @user.LastName</td>
+                                                <td>@user.Email</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <p>No users registered for this event.</p>
+                            }
+                        </details>
+
+                        <details>
+                            <summary>Volunteers</summary>
+                            @if (VolunteersByEvent.TryGetValue(eventItem.EventId, out var volunteers) && volunteers.Any())
+                            {
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var user in volunteers)
+                                        {
+                                            <tr>
+                                                <td>@user.FirstName @user.LastName</td>
+                                                <td>@user.Email</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <p>No volunteers registered for this event.</p>
+                            }
+                        </details>
+
                     </details>
                 </li>
             }
@@ -100,32 +142,63 @@
                 <li>
                     <details>
                         <summary>@eventItem.EventTitle</summary>
-                        @if (RegisteredUsersByEvent.TryGetValue(eventItem.EventId, out var users) && users.Any())
-                        {
-                            <table border="1" style="width: 100%; border-collapse: collapse;">
-                                <thead>
-                                    <tr>
-                                        <th style="padding: 10px; text-align: left;">Name</th>
-                                        <th style="padding: 10px; text-align: left;">Username</th>
-                                        <th style="padding: 10px; text-align: left;">Email</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var user in users)
-                                    {
+
+                        <details>
+                            <summary>Registered Users</summary>
+                            @if (RegisteredUsersByEvent.TryGetValue(eventItem.EventId, out var users) && users.Any())
+                            {
+                                <table>
+                                    <thead>
                                         <tr>
-                                            <td style="padding: 10px;">@user.FirstName @user.LastName</td>
-                                            <td style="padding: 10px;">@user.UserName</td>
-                                            <td style="padding: 10px;">@user.Email</td>
+                                            <th>Name</th>
+                                            <th>Email</th>
                                         </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        }
-                        else
-                        {
-                            <p>No users registered for this event.</p>
-                        }
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var user in users)
+                                        {
+                                            <tr>
+                                                <td>@user.FirstName @user.LastName</td>
+                                                <td>@user.Email</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <p>No users registered for this event.</p>
+                            }
+                        </details>
+
+                        <details>
+                            <summary>Volunteers</summary>
+                            @if (VolunteersByEvent.TryGetValue(eventItem.EventId, out var volunteers) && volunteers.Any())
+                            {
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var user in volunteers)
+                                        {
+                                            <tr>
+                                                <td>@user.FirstName @user.LastName</td>
+                                                <td>@user.Email</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <p>No volunteers registered for this event.</p>
+                            }
+                        </details>
+
                     </details>
                 </li>
             }
