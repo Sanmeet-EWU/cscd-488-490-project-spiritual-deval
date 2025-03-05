@@ -1,7 +1,10 @@
 @page "/admin/mail"
-@using System.Net.Mail;
-@using System;
-@using System.Net;
+@using System.Net.Mail
+@using System.Net
+@using Microsoft.EntityFrameworkCore
+@using SpiritualDevalApp.Data
+@using SpiritualDevalApp.Models.Entities
+@inject AppDbContext DbContext
 @layout MainLayout
 @rendermode InteractiveServer
 
@@ -27,32 +30,42 @@
     private string EmailBody { get; set; } = "";
     private string Message { get; set; } = "";
 
-    private void SendMail()
+    private async Task SendMail()
     {
-        Console.WriteLine("Send button clicked");
-
-        Message = "Button clicked!";
-        StateHasChanged(); // Ensures UI updates
-
         try
         {
-            Console.WriteLine("SendMail method triggered");
-            using (MailMessage mail = new MailMessage())
-            {
-                mail.From = new MailAddress("spiritualdeval@gmail.com");
-                mail.To.Add("elvicky916@gmail.com");
-                mail.Subject = EmailTitle;
-                mail.Body = EmailBody;
-                mail.IsBodyHtml = false; // Sends the email as plain text
+            // Fetch all users who are subscribed
+            var subscribedUsers = await DbContext.UserAccounts
+                .Where(u => u.SubscribedToVolunteerUpdates && !string.IsNullOrEmpty(u.Email))
+                .ToListAsync();
 
-                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587)) 
+            if (subscribedUsers.Count == 0)
+            {
+                Message = "No subscribed users to send emails to.";
+                return;
+            }
+
+            using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+            {
+                smtp.Credentials = new NetworkCredential("spiritualdeval@gmail.com", "ixqieyynjgnnlxyn");
+                smtp.EnableSsl = true;
+
+                foreach (var user in subscribedUsers)
                 {
-                    smtp.Credentials = new NetworkCredential("spiritualdeval@gmail.com", "ixqieyynjgnnlxyn");
-                    smtp.EnableSsl = true;
-                    smtp.Send(mail);
-                    Message = "Mail Sent"; 
+                    using (MailMessage mail = new MailMessage())
+                    {
+                        mail.From = new MailAddress("spiritualdeval@gmail.com");
+                        mail.To.Add(user.Email);
+                        mail.Subject = EmailTitle;
+                        mail.Body = EmailBody;
+                        mail.IsBodyHtml = false;
+
+                        await smtp.SendMailAsync(mail);
+                    }
                 }
             }
+
+            Message = $"Mail Sent to {subscribedUsers.Count} users.";
         }
         catch (Exception ex)
         {
