@@ -1,0 +1,51 @@
+@page "/admin/promote"
+@layout MainLayout
+@rendermode InteractiveServer
+@using SpiritualDevalApp.Data
+@using Microsoft.AspNetCore.Components
+@using Microsoft.EntityFrameworkCore
+@using SpiritualDevalApp.Models.Entities
+
+<PageTitle>Promote User to Admin</PageTitle>
+<h2>Enter the email of the user you want to promote to admin:</h2>
+<div class="promote-admin-container">
+    <EditForm Model="promotionModel" OnValidSubmit="HandlePromotion">
+        <div class="form-group">
+            <label for="emailInput">Email:</label>
+            <InputText id="emailInput" @bind-Value="promotionModel.Email" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Promote</button>
+    </EditForm>
+    
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <p>@message</p>
+    }
+</div>
+
+@code {
+    private PromotionModel promotionModel = new();
+    private string? message;
+
+    [Inject] private AppDbContext DbContext { get; set; } = null!;
+
+    private async Task HandlePromotion()
+    {
+        var user = await DbContext.UserAccounts.FirstOrDefaultAsync(u => u.Email == promotionModel.Email);
+        if (user != null)
+        {
+            user.Role = "Administrator";
+            await DbContext.SaveChangesAsync();
+            message = $"User {user.Email} has been promoted to Administrator.";
+        }
+        else
+        {
+            message = "User not found.";
+        }
+    }
+
+    private class PromotionModel
+    {
+        public string Email { get; set; } = string.Empty;
+    }
+}
