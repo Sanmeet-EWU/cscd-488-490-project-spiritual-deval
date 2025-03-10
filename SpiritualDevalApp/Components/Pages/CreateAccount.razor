@@ -1,6 +1,7 @@
 @page "/CreateAccount"
 @layout MainLayout
 @rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
 @using SpiritualDevalApp.Data
 @using Microsoft.AspNetCore.Identity
 @using SpiritualDevalApp.Models.Entities
@@ -72,6 +73,9 @@
 
     private async Task HandleValidSubmit()
     {
+        // Check if there are any existing users in the database
+        bool isFirstUser = !await DbContext.UserAccounts.AnyAsync();
+
         // Hash the password before storing it
         var hashedPassword = PasswordHasher.HashPassword(user, user.Password);
 
@@ -79,7 +83,7 @@
         {
             UserName = user.UserName,
             Password = hashedPassword,
-            Role = "User",  // Default role
+            Role = isFirstUser ? "Administrator" : "User",  // Assign Admin role to the first user
             FirstName = user.FirstName,
             LastName = user.LastName,
             Email = user.Email

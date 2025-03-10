@@ -33,5 +33,8 @@ namespace SpiritualDevalApp.Models.Entities
         [Column("email")]
         [MaxLength(100)]
         public string? Email { get; set; }
+
+        [Column("subscribed_to_volunteer_updates")]
+        public bool SubscribedToVolunteerUpdates { get; set; } = false;
     }
 }

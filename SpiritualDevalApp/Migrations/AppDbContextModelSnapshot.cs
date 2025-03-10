@@ -124,6 +124,10 @@ namespace SpiritualDevalApp.Migrations
                         .HasColumnType("varchar(20)")
                         .HasColumnName("role");
 
+                    b.Property<bool>("SubscribedToVolunteerUpdates")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("subscribed_to_volunteer_updates");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)")

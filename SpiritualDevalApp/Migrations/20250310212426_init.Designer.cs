@@ -12,8 +12,8 @@ using SpiritualDevalApp.Data;
 namespace SpiritualDevalApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250203211812_UpdateDatabaseSchema")]
-    partial class UpdateDatabaseSchema
+    [Migration("20250310212426_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -126,6 +126,10 @@ namespace SpiritualDevalApp.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)")
                         .HasColumnName("role");
+
+                    b.Property<bool>("SubscribedToVolunteerUpdates")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("subscribed_to_volunteer_updates");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(100)
