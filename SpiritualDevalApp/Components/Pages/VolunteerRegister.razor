@@ -126,6 +126,10 @@
                     <textarea id="skillsProvided" @bind="SkillsProvided" class="form-control" rows="3"></textarea>
                 </div>
                 <button class="register-btn" @onclick="RegisterAsVolunteer">Register as Volunteer</button>
+
+                <button class="register-btn @(IsSubscribed ? "btn-danger" : "btn-primary") mt-2" @onclick="ToggleSubscription">
+                @(IsSubscribed ? "Unsubscribe from Updates" : "Subscribe for Updates")
+                </button>
             }
             else
             {
@@ -145,17 +149,17 @@
 </div>
 
 @code {
-    [Parameter]
-    public int EventId { get; set; }
-
+    [Parameter] public int EventId { get; set; }
     private Event? EventDetails { get; set; }
     private int CurrentVolunteers { get; set; }
     private string SkillsProvided { get; set; } = string.Empty;
     private string Message { get; set; } = string.Empty;
+    private bool IsSubscribed { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadEventDetails();
+        await CheckSubscriptionStatus();
     }
 
     private async Task LoadEventDetails()
@@ -166,6 +170,50 @@
         {
             CurrentVolunteers = await DbContext.VolunteerRegistrations
                 .CountAsync(v => v.EventId == EventId);
+        }
+    }
+
+    private async Task CheckSubscriptionStatus()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            var username = user.Identity.Name;
+            if (!string.IsNullOrEmpty(username))
+            {
+                var loggedInUser = await DbContext.UserAccounts
+                    .FirstOrDefaultAsync(u => u.UserName == username);
+
+                if (loggedInUser != null)
+                {
+                    IsSubscribed = loggedInUser.SubscribedToVolunteerUpdates;
+                }
+            }
+        }
+    }
+
+    private async Task ToggleSubscription()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            var username = user.Identity.Name;
+            if (!string.IsNullOrEmpty(username))
+            {
+                var loggedInUser = await DbContext.UserAccounts
+                    .FirstOrDefaultAsync(u => u.UserName == username);
+
+                if (loggedInUser != null)
+                {
+                    loggedInUser.SubscribedToVolunteerUpdates = !loggedInUser.SubscribedToVolunteerUpdates;
+                    await DbContext.SaveChangesAsync();
+                    IsSubscribed = loggedInUser.SubscribedToVolunteerUpdates;
+                }
+            }
         }
     }
 
@@ -193,7 +241,6 @@
                         return;
                     }
 
-                    // Check if user is already a volunteer
                     var existingVolunteer = await DbContext.VolunteerRegistrations
                         .AnyAsync(v => v.EventId == EventId && v.UserId == userId);
 
@@ -221,7 +268,7 @@
                     await DbContext.SaveChangesAsync();
 
                     Message = $"Successfully registered as a volunteer for {EventDetails.EventTitle}!";
-
+                    
                     // Refresh volunteer count
                     CurrentVolunteers++;
                 }
