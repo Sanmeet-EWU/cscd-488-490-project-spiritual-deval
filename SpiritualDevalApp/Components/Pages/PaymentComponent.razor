@@ -1,0 +1,18 @@
+@inject IJSRuntime JS
+@using Microsoft.JSInterop
+@inject HttpClient Http
+@code {
+    private string? _orderId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await Http.GetFromJsonAsync<string>("api/payment/createorder");
+        _orderId = response;
+    }
+
+    private async Task LaunchRazorpay()
+    {
+        await JS.InvokeVoidAsync("launchRazorpay", _orderId);
+    }
+}
+<button @onclick="LaunchRazorpay">Pay Now</button>

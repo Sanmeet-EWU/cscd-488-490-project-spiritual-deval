@@ -36,8 +36,19 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IPasswordHasher<UserAccount>, PasswordHasher<UserAccount>>();
 
 
+
+
+// Register HttpClient for Blazor Server DI
+builder.Services.AddScoped(sp => new HttpClient
+{
+    BaseAddress = new Uri("https://api.razorpay.com/v1/") // Razorpay API base URL
+});
+
+
+
+
 var app = builder.Build();
-// hola dafd
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
