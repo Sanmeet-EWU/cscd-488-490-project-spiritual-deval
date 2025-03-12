@@ -5,85 +5,69 @@
 @using SpiritualDevalApp.Data
 @using Microsoft.AspNetCore.Identity
 @using SpiritualDevalApp.Models.Entities
+@using System.ComponentModel.DataAnnotations
 
 <PageTitle>Create Account</PageTitle>
 <h2>Enter your details</h2>
 <div class="create-account-container">
     <div class="create-account-box">
         <EditForm Model="user" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
             <div class="form-group">
                 <label for="userNameInput">User Name:</label>
                 <InputText id="userNameInput" @bind-Value="user.UserName" class="form-control" />
+                <ValidationMessage For="@(() => user.UserName)" />
             </div>
             <div class="form-group">
                 <label for="passwordInput">Password:</label>
-                <InputText id="passwordInput" @bind-Value="user.Password" class="form-control" type="password" />
+                <InputText id="passwordInput" @bind-Value="password" class="form-control" type="password" />
+                <ValidationMessage For="@(() => password)" />
             </div>
             <div class="form-group">
                 <label for="firstNameInput">First Name:</label>
                 <InputText id="firstNameInput" @bind-Value="user.FirstName" class="form-control" />
+                <ValidationMessage For="@(() => user.FirstName)" />
             </div>
             <div class="form-group">
                 <label for="lastNameInput">Last Name:</label>
                 <InputText id="lastNameInput" @bind-Value="user.LastName" class="form-control" />
+                <ValidationMessage For="@(() => user.LastName)" />
             </div>
             <div class="form-group">
                 <label for="emailInput">Email:</label>
                 <InputText id="emailInput" @bind-Value="user.Email" class="form-control" />
+                <ValidationMessage For="@(() => user.Email)" />
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </EditForm>
     </div>
 </div>
 
-@if (!string.IsNullOrEmpty(user.UserName))
-{
-    <p>Your username: @user.UserName</p>
-}
-@if (!string.IsNullOrEmpty(user.Password))
-{
-    <p>Your password: @user.Password</p>
-}
-@if (!string.IsNullOrEmpty(user.FirstName))
-{
-    <p>Your first name: @user.FirstName</p>
-}
-@if (!string.IsNullOrEmpty(user.LastName))
-{
-    <p>Your last name: @user.LastName</p>
-}
-@if (!string.IsNullOrEmpty(user.Email))
-{
-    <p>Your email: @user.Email</p>
-}
-
 @code {
+    private UserModel user = new UserModel();
+    private string password = string.Empty;
 
-    private User user = new User();
-
-    // Injecting DbContext, PasswordHasher, and NavigationManager
-    [Inject] 
-    private AppDbContext DbContext { get; set; } = null!;
-
-    [Inject]
-    private IPasswordHasher<User> PasswordHasher { get; set; } = null!;
-
-    [Inject]
-    private NavigationManager NavigationManager { get; set; } = null!;
+    [Inject] private AppDbContext DbContext { get; set; } = null!;
+    [Inject] private IPasswordHasher<UserAccount> PasswordHasher { get; set; } = null!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = null!;
 
     private async Task HandleValidSubmit()
     {
-        // Check if there are any existing users in the database
-        bool isFirstUser = !await DbContext.UserAccounts.AnyAsync();
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            return; // Password should not be empty
+        }
 
-        // Hash the password before storing it
-        var hashedPassword = PasswordHasher.HashPassword(user, user.Password);
+        bool isFirstUser = !await DbContext.UserAccounts.AnyAsync();
+        var hashedPassword = PasswordHasher.HashPassword(new UserAccount(), password);
 
         var newUser = new UserAccount
         {
             UserName = user.UserName,
             Password = hashedPassword,
-            Role = isFirstUser ? "Administrator" : "User",  // Assign Admin role to the first user
+            Role = isFirstUser ? "Administrator" : "User",
             FirstName = user.FirstName,
             LastName = user.LastName,
             Email = user.Email
@@ -91,8 +75,22 @@
 
         await DbContext.UserAccounts.AddAsync(newUser);
         await DbContext.SaveChangesAsync();
-
-        // Redirect to the login page after successful account creation
         NavigationManager.NavigateTo("/login");
+    }
+
+    public class UserModel
+    {
+        [Required(ErrorMessage = "User Name is required")]
+        public string UserName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "First Name is required")]
+        public string FirstName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Last Name is required")]
+        public string LastName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email format")]
+        public string Email { get; set; } = string.Empty;
     }
 }
