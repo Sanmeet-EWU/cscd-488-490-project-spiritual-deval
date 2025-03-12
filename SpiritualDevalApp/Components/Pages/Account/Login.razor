@@ -14,8 +14,9 @@
         <EditForm Model="@Model" OnValidSubmit="Authenticate" FormName="LoginForm">
             <DataAnnotationsValidator />
             <div class="mb-3 text-center flex-column">
-                <h3>LOGIN</h3>
+                <h3>Log In</h3>
             </div>
+            
             <div class="mb-3">
                 <label>User Name</label>
                 <InputText @bind-Value="Model.UserName" class="form-control" placeholder="Username" />
@@ -30,7 +31,7 @@
                 <span class="text-danger">@errorMessage</span>
             </div>
             <div class="mb-3 d-grid gap-2">
-                <button type="submit" class="btn btn-primary">Login</button>
+                <button type="submit" style="background-color: #3e8e41; color: white; border: none; padding: 10px 20px;">Login</button>
             </div>
         </EditForm>
         <div class="mt-3 text-center">
