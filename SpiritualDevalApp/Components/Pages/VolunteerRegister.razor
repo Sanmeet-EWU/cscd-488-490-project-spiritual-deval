@@ -8,18 +8,114 @@
 
 <PageTitle>Volunteer Registration</PageTitle>
 
-<h1>Volunteer for Event</h1>
+<style>
+    body {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        background-color: #f9f9f9;
+        color: #333;
+        padding: 40px;
+        text-align: center;
+    }
 
-@if (EventDetails != null)
-{
-    <div class="card">
-        <div class="card-body">
-            <h2>@EventDetails.EventTitle</h2>
-            <p><strong>Description:</strong> @EventDetails.EventDescription</p>
-            <p><strong>Date:</strong> @EventDetails.EventDate.ToString("f")</p>
-            <p><strong>Location:</strong> @EventDetails.EventLocation</p>
-            <p><strong>Volunteers Needed:</strong> @CurrentVolunteers / @EventDetails.VolunteersRequired</p>
-            <p><strong>Skills Required:</strong> @EventDetails.SkillsRequired</p>
+    .container {
+        max-width: 650px;
+        margin: auto;
+        padding: 20px;
+    }
+
+    .card {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+        padding: 25px;
+        border-left: 6px solid #556b2f;
+        text-align: left;
+        line-height: 1.6;
+    }
+
+    .title-box {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 80px;
+        font-size: 32px;
+        font-weight: bold;
+        color: #556b2f;
+    }
+
+    .event-detail {
+        font-size: 17px;
+        margin-bottom: 12px;
+        color: #444;
+    }
+
+    .register-btn {
+        background-color: #556b2f;
+        color: white;
+        padding: 12px 18px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+        font-size: 16px;
+        width: 100%;
+        text-align: center;
+        margin-top: 15px;
+    }
+
+    .register-btn:hover {
+        background-color: #6b8e23;
+    }
+
+    .full-event {
+        color: red;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .message {
+        margin-top: 20px;
+        font-size: 17px;
+        font-weight: bold;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .success {
+        color: #fff;
+        background: #4CAF50;
+    }
+
+    .error {
+        color: #fff;
+        background: #D32F2F;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-top: 8px;
+        font-size: 16px;
+    }
+</style>
+
+<div class="container">
+    <h1 style="color: #556b2f;">Volunteer for Event</h1>
+
+    @if (EventDetails != null)
+    {
+        <div class="card">
+            <!-- Centered 'Volunteer' Title -->
+            <div class="title-box">Volunteer</div>
+
+            <!-- Left-Aligned Event Details -->
+            <p class="event-detail"><strong>Description:</strong> @EventDetails.EventDescription</p>
+            <p class="event-detail"><strong>Date:</strong> @EventDetails.EventDate.ToString("f")</p>
+            <p class="event-detail"><strong>Location:</strong> @EventDetails.EventLocation</p>
+            <p class="event-detail"><strong>Volunteers Needed:</strong> @CurrentVolunteers / @EventDetails.VolunteersRequired</p>
+            <p class="event-detail"><strong>Skills Required:</strong> @EventDetails.SkillsRequired</p>
             
             @if (CurrentVolunteers < EventDetails.VolunteersRequired)
             {
@@ -27,21 +123,24 @@
                     <label for="skillsProvided"><strong>Skills Provided (optional):</strong></label>
                     <textarea id="skillsProvided" @bind="SkillsProvided" class="form-control" rows="3"></textarea>
                 </div>
-                <button class="btn btn-primary mt-2" @onclick="RegisterAsVolunteer">Register as Volunteer</button>
+                <button class="register-btn" @onclick="RegisterAsVolunteer">Register as Volunteer</button>
             }
             else
             {
-                <p class="text-danger">Volunteer limit reached for this event.</p>
+                <p class="full-event">Volunteer limit reached for this event.</p>
             }
         </div>
-    </div>
-}
-else
-{
-    <p>Loading event details...</p>
-}
+    }
+    else
+    {
+        <p>Loading event details...</p>
+    }
 
-<p>@Message</p>
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <p class="message @(Message.Contains("Successfully") ? "success" : "error")">@Message</p>
+    }
+</div>
 
 @code {
     [Parameter]
@@ -120,7 +219,7 @@ else
                     await DbContext.SaveChangesAsync();
 
                     Message = $"Successfully registered as a volunteer for {EventDetails.EventTitle}!";
-                    
+
                     // Refresh volunteer count
                     CurrentVolunteers++;
                 }

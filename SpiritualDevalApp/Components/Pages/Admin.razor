@@ -55,8 +55,8 @@
 <h1>Event Management</h1>
 
 <div style="text-align: center;">
-    <NavLink class="btn" href="/admin/event/create">Create Event</NavLink>
-    <NavLink class="btn" href="/admin/mail">Send Volunteer Update</NavLink>
+    <button class="btn" onclick="location.href='/admin/event/create'">Create Event</button>
+    <button class="btn" onclick="location.href='/admin/mail'">Send Update</button>
 </div>
 
 <section class="Events">
@@ -67,66 +67,36 @@
             @foreach (var eventItem in UpcomingEvents)
             {
                 <li>
-                    <details>
-                        <summary>@eventItem.EventTitle</summary>
+                    <h3>@eventItem.EventTitle</h3>
+                    <h4>Registered</h4>
+                    @if (RegisteredUsersByEvent.TryGetValue(eventItem.EventId, out var users) && users.Any())
+                    {
+                        <ul>
+                            @foreach (var user in users)
+                            {
+                                <li>@user.FirstName @user.LastName</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>No registrations.</p>
+                    }
 
-                        <details>
-                            <summary>Registered Users</summary>
-                            @if (RegisteredUsersByEvent.TryGetValue(eventItem.EventId, out var users) && users.Any())
+                    <h4>Volunteers</h4>
+                    @if (VolunteersByEvent.TryGetValue(eventItem.EventId, out var volunteers) && volunteers.Any())
+                    {
+                        <ul>
+                            @foreach (var user in volunteers)
                             {
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var user in users)
-                                        {
-                                            <tr>
-                                                <td>@user.FirstName @user.LastName</td>
-                                                <td>@user.Email</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
+                                <li>@user.FirstName @user.LastName</li>
                             }
-                            else
-                            {
-                                <p>No users registered for this event.</p>
-                            }
-                        </details>
-
-                        <details>
-                            <summary>Volunteers</summary>
-                            @if (VolunteersByEvent.TryGetValue(eventItem.EventId, out var volunteers) && volunteers.Any())
-                            {
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var user in volunteers)
-                                        {
-                                            <tr>
-                                                <td>@user.FirstName @user.LastName</td>
-                                                <td>@user.Email</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            }
-                            else
-                            {
-                                <p>No volunteers registered for this event.</p>
-                            }
-                        </details>
-
-                    </details>
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>No volunteers.</p>
+                    }
                 </li>
             }
         </ul>
@@ -145,66 +115,36 @@
             @foreach (var eventItem in PastEvents)
             {
                 <li>
-                    <details>
-                        <summary>@eventItem.EventTitle</summary>
+                    <h3>@eventItem.EventTitle</h3>
+                    <h4>Registered</h4>
+                    @if (RegisteredUsersByEvent.TryGetValue(eventItem.EventId, out var users) && users.Any())
+                    {
+                        <ul>
+                            @foreach (var user in users)
+                            {
+                                <li>@user.FirstName @user.LastName</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>No registrations.</p>
+                    }
 
-                        <details>
-                            <summary>Registered Users</summary>
-                            @if (RegisteredUsersByEvent.TryGetValue(eventItem.EventId, out var users) && users.Any())
+                    <h4>Volunteers</h4>
+                    @if (VolunteersByEvent.TryGetValue(eventItem.EventId, out var volunteers) && volunteers.Any())
+                    {
+                        <ul>
+                            @foreach (var user in volunteers)
                             {
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var user in users)
-                                        {
-                                            <tr>
-                                                <td>@user.FirstName @user.LastName</td>
-                                                <td>@user.Email</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
+                                <li>@user.FirstName @user.LastName</li>
                             }
-                            else
-                            {
-                                <p>No users registered for this event.</p>
-                            }
-                        </details>
-
-                        <details>
-                            <summary>Volunteers</summary>
-                            @if (VolunteersByEvent.TryGetValue(eventItem.EventId, out var volunteers) && volunteers.Any())
-                            {
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var user in volunteers)
-                                        {
-                                            <tr>
-                                                <td>@user.FirstName @user.LastName</td>
-                                                <td>@user.Email</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            }
-                            else
-                            {
-                                <p>No volunteers registered for this event.</p>
-                            }
-                        </details>
-
-                    </details>
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>No volunteers.</p>
+                    }
                 </li>
             }
         </ul>
