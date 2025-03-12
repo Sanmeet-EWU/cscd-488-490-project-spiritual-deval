@@ -2,26 +2,89 @@
 
 <PageTitle>About</PageTitle>
 
-<h1 class="header-text">About the Spiritual Temple</h1>
+<h1 class="header-text">Welcome to the Spiritual Temple</h1>
 
-<p class="about-text">Welcome to the Spiritual Temple. We are dedicated to fostering peace, harmony, and spiritual growth within our community. Our temple serves as a sanctuary for individuals seeking connection, reflection, and enlightenment. While we are still growing and evolving, we aim to create a space where all are welcome to join us in our spiritual practices.</p>
+<p class="about-text">
+    Step into a world of peace, harmony, and spiritual enlightenment. Our temple is more than just a place—it's a journey, a sanctuary, and a home for all seeking wisdom, connection, and serenity. 🌿
+</p>
 
-<p class="about-text">We look forward to sharing more about our mission and vision with you as we continue to build and expand our efforts. Stay connected for updates and more information on our programs and services.</p>
+<p class="about-text">
+    As we continue to grow, we invite you to join us in our spiritual practices, celebrations, and moments of reflection. Stay connected for inspiring events, meditations, and ways to deepen your spiritual journey.
+</p>
+
+<!-- Adding Images with Hover Effects -->
+<div class="image-gallery">
+    <img src="images/pic1.png" alt="Temple Image 1" class="temple-img">
+    <img src="images/pic2.png" alt="Temple Image 2" class="temple-img">
+    <img src="images/pic3.png" alt="Temple Image 3" class="temple-img">
+    <img src="images/pic4.png" alt="Temple Image 4" class="temple-img">
+</div>
+
 
 <style>
-    .header-text {
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f0;
         text-align: center;
-        font-size: 2em;
-        color: #556b2f; /* Olive green */
-        font-family: 'Georgia', 'Times New Roman', serif; /* Elegant serif font */
+        margin: 0;
+        padding: 0;
+    }
+
+    .header-text {
+        font-size: 2.5em;
+        color: #3d6b2f;
+        font-family: "Georgia", serif;
         margin: 50px 0 20px;
+        transition: transform 0.3s ease-in-out, color 0.3s ease-in-out;
+    }
+
+    .header-text:hover {
+        transform: scale(1.05);
+        color: #2c5b2f;
     }
 
     .about-text {
-        text-align: center;
-        font-size: 1.2em;
-        margin: 20px auto;
+        font-size: 1.3em;
         max-width: 800px;
-        color: #333;
+        margin: 20px auto;
+        color: #444;
+        line-height: 1.6;
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    .about-text:hover {
+        opacity: 0.8;
+    }
+
+    .image-gallery {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: 30px;
+    }
+
+    .temple-img {
+        max-width: 220px;
+        height: auto;
+        border-radius: 15px;
+        box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .temple-img:hover {
+        transform: scale(1.1);
+        box-shadow: 6px 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .floating-symbols {
+        font-size: 1.5em;
+        color: #9c6b3f;
+        margin-top: 30px;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .floating-symbols:hover {
+        transform: translateY(-5px);
     }
 </style>
