@@ -127,7 +127,7 @@
                 </div>
                 <button class="register-btn" @onclick="RegisterAsVolunteer">Register as Volunteer</button>
 
-                <button class="register-btn @(IsSubscribed ? "btn-danger" : "btn-primary") mt-2" @onclick="ToggleSubscription">
+                <button class="register-btn" @onclick="ToggleSubscription">
                 @(IsSubscribed ? "Unsubscribe from Updates" : "Subscribe for Updates")
                 </button>
             }
