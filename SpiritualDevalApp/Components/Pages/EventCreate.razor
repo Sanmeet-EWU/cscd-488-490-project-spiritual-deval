@@ -1,8 +1,12 @@
 @page "/admin/event/create"
 @layout MainLayout
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
 @using SpiritualDevalApp.Models.Entities
 @using SpiritualDevalApp.Data
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Administrator")]
 
 
 <EditForm Model="eventModel" OnValidSubmit="HandleValidSubmit">
