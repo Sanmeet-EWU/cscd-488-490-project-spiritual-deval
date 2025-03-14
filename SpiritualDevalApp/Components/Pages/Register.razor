@@ -109,8 +109,7 @@
             <p class="event-detail"><strong>Location:</strong> @EventDetails.EventLocation</p>
             <p class="event-detail"><strong>Participants:</strong> @CurrentParticipants / @EventDetails.MaxParticipants</p>
             <p class="event-detail"><strong>Volunteers Needed:</strong> @EventDetails.VolunteersRequired</p>
-            <p class="event-detail"><strong>Skills Required:</strong> @EventDetails.SkillsRequired</p>
-            
+           
             @if (CurrentParticipants < EventDetails.MaxParticipants)
             {
                 <button class="register-btn" @onclick="RegisterToEvent">Register</button>
