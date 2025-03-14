@@ -1,0 +1,144 @@
+@page "/admin/mail"
+@using System.Net.Mail;
+@using System;
+@using System.Net;
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@layout MainLayout
+@rendermode InteractiveServer
+@attribute [Authorize(Roles = "Administrator")]
+
+<PageTitle>Send Mail</PageTitle>
+
+
+
+<div class="form-container">
+    <div class="form-group">
+        <label for="EmailTitle">Email Title:</label>
+        <input type="text" id="EmailTitle" @bind="EmailTitle" class="form-control" placeholder="Enter the email title" />
+    </div>
+    <div class="form-group">
+        <label for="EmailBody">Email Body:</label>
+        <textarea id="EmailBody" @bind="EmailBody" class="form-control" placeholder="Enter the email body"></textarea>
+    </div>
+    
+    <div class="form-group">
+        <button type="button" class="btn btn-primary mt-2" @onclick="SendMail">Send Mail</button>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <div class="message-container">
+            <span class="message">@Message</span>
+        </div>
+    }
+</div>
+
+@code {
+    private string EmailTitle { get; set; } = "";
+    private string EmailBody { get; set; } = "";
+    private string Message { get; set; } = "";
+
+    private void SendMail()
+    {
+        Console.WriteLine("Send button clicked");
+
+        Message = "Button clicked!";
+        StateHasChanged(); // Ensures UI updates
+
+        try
+        {
+            Console.WriteLine("SendMail method triggered");
+            using (MailMessage mail = new MailMessage())
+            {
+                mail.From = new MailAddress("spiritualdeval@gmail.com");
+                mail.To.Add("elvicky916@gmail.com");
+                mail.Subject = EmailTitle;
+                mail.Body = EmailBody;
+                mail.IsBodyHtml = false; // Sends the email as plain text
+
+                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                {
+                    smtp.Credentials = new NetworkCredential("spiritualdeval@gmail.com", "ixqieyynjgnnlxyn");
+                    smtp.EnableSsl = true;
+                    smtp.Send(mail);
+                    Message = "Mail Sent"; 
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Message = $"Error: {ex.Message}";
+        }
+    }
+}
+
+<style>
+    .form-title {
+        text-align: center;
+        font-size: 28px;
+        color: #3e654a;
+        margin-bottom: 20px;
+    }
+
+    .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 30px;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .form-group .form-control {
+        width: 100%;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        font-size: 16px;
+        box-sizing: border-box;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-group .form-control:focus {
+        border-color: #3e654a;
+        outline: none;
+    }
+
+    .btn-primary {
+        width: 100%;
+        background-color: #3e654a;
+        padding: 12px;
+        font-size: 16px;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #2e4d39;
+    }
+
+    .message-container {
+        margin-top: 20px;
+        padding: 10px;
+        border-radius: 6px;
+    }
+
+    .message {
+        font-weight: bold;
+        color: #333;
+    }
+</style>

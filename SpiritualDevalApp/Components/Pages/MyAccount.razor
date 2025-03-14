@@ -1,0 +1,128 @@
+@page "/my-account"
+@layout MainLayout
+@rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using SpiritualDevalApp.Data
+@using Microsoft.AspNetCore.Identity
+@using SpiritualDevalApp.Models.Entities
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AppDbContext DbContext
+@inject NavigationManager NavigationManager
+
+<PageTitle>My Account</PageTitle>
+
+<h1 class="header-text">My Account</h1>
+
+<div class="account-container">
+    <div class="account-box">
+        <h2>User Information</h2>
+        @if (loggedInUser != null)
+        {
+            <p><strong>First Name:</strong> @loggedInUser.FirstName</p>
+            <p><strong>Last Name:</strong> @loggedInUser.LastName</p>
+            <p><strong>Username:</strong> @loggedInUser.UserName</p>
+        }
+        else
+        {
+            <p>Loading user information...</p>
+        }
+    </div>
+
+    <div class="account-box">
+        <h2>Change Password</h2>
+        <EditForm Model="user" OnValidSubmit="HandleValidSubmit">
+            <div class="form-group">
+                <label for="passwordInput">New Password:</label>
+                <InputText id="passwordInput" @bind-Value="user.Password" class="form-control" type="password" />
+            </div>
+            <button type="submit" class="cta-button">Update Password</button>
+        </EditForm>
+    </div>
+</div>
+
+<style>
+    .header-text {
+        text-align: center;
+        font-size: 2em;
+        color: #556b2f;
+        font-family: 'Georgia', 'Times New Roman', serif;
+        margin: 50px 0 20px;
+    }
+
+    .account-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        max-width: 600px;
+        margin: auto;
+    }
+
+    .account-box {
+        width: 100%;
+        padding: 20px;
+        background-color: #f4f4f4;
+        border-radius: 8px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .cta-button {
+        display: block;
+        width: 100%;
+        background-color: #4f7c5d;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .cta-button:hover {
+        background-color: #3e654a;
+    }
+</style>
+
+@code {
+    private User user = new User();
+    private UserAccount? loggedInUser;
+
+    [CascadingParameter]
+    public HttpContext HttpContext { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userPrincipal = authState.User;
+
+        if (userPrincipal.Identity.IsAuthenticated)
+        {
+            var username = userPrincipal.Identity.Name;
+            if (!string.IsNullOrEmpty(username))
+            {
+                loggedInUser = await DbContext.UserAccounts.FirstOrDefaultAsync(u => u.UserName == username);
+            }
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (loggedInUser != null)
+        {
+            var passwordHasher = new PasswordHasher<UserAccount>();
+            var hashedPassword = passwordHasher.HashPassword(loggedInUser, user.Password);
+            loggedInUser.Password = hashedPassword;
+            Console.WriteLine($"Hashed Password: {hashedPassword}");
+            DbContext.UserAccounts.Update(loggedInUser);
+            await DbContext.SaveChangesAsync();
+            NavigationManager.NavigateTo("/logout", true);
+        }
+    }
+}

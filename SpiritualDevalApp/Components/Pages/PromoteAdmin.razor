@@ -1,0 +1,123 @@
+@page "/admin/promote"
+@layout MainLayout
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using SpiritualDevalApp.Data
+@using Microsoft.AspNetCore.Components
+@using Microsoft.EntityFrameworkCore
+@using SpiritualDevalApp.Models.Entities
+
+@attribute [Authorize(Roles = "Administrator")]
+
+<PageTitle>Promote User to Admin</PageTitle>
+
+<div class="form-container">
+    <h2 class="form-title">Promote User to Admin</h2>
+
+    <EditForm Model="promotionModel" OnValidSubmit="HandlePromotion">
+        <div class="form-group">
+            <label for="emailInput">Email:</label>
+            <InputText id="emailInput" @bind-Value="promotionModel.Email" class="form-control" placeholder="Enter user email" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Promote</button>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="message-container">
+            <span class="message">@message</span>
+        </div>
+    }
+</div>
+
+@code {
+    private PromotionModel promotionModel = new();
+    private string? message;
+
+    [Inject] private AppDbContext DbContext { get; set; } = null!;
+
+    private async Task HandlePromotion()
+    {
+        var user = await DbContext.UserAccounts.FirstOrDefaultAsync(u => u.Email == promotionModel.Email);
+        if (user != null)
+        {
+            user.Role = "Administrator";
+            await DbContext.SaveChangesAsync();
+            message = $"User {user.Email} has been promoted to Administrator.";
+        }
+        else
+        {
+            message = "User not found.";
+        }
+    }
+
+    private class PromotionModel
+    {
+        public string Email { get; set; } = string.Empty;
+    }
+}
+
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 30px;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .form-title {
+        font-size: 24px;
+        color: #3e654a;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+
+    .form-group label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        font-size: 16px;
+    }
+
+    .btn-primary {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        border: none;
+        color: white;
+        background-color: #3e654a;
+    }
+
+    .btn-primary:hover {
+        background-color: #2e4d39;
+    }
+
+    .message-container {
+        margin-top: 20px;
+        padding: 10px;
+        border-radius: 6px;
+    }
+
+    .message {
+        font-weight: bold;
+        color: #333;
+    }
+</style>

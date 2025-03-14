@@ -1,0 +1,228 @@
+@page "/register/{eventId:int}"
+@using Microsoft.EntityFrameworkCore
+@using SpiritualDevalApp.Data
+@using SpiritualDevalApp.Models.Entities
+@inject AppDbContext DbContext
+@inject AuthenticationStateProvider AuthProvider
+@rendermode InteractiveServer
+
+<PageTitle>Event Registration</PageTitle>
+
+<style>
+    body {
+        font-family: 'Georgia', 'Times New Roman', serif;
+        background-color: #f9f9f9;
+        color: #333;
+        padding: 10px; /* Reduce padding */
+        text-align: center;
+    }
+
+    .container {
+        max-width: 650px;
+        margin: auto;
+        padding: 20px;
+    }
+
+    .card {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        border: 2px solid #556b2f; /* Use full border */
+        text-align: left;
+        line-height: 1.6;
+        width: 100%; /* Make it stretch evenly */
+        max-width: 750px; /* Slightly larger than before */
+    }
+
+    .title-box {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 80px;
+        font-size: 32px;
+        font-weight: bold;
+        color: #556b2f;
+    }
+
+    .event-detail {
+        font-size: 17px;
+        margin-bottom: 12px;
+        color: #444;
+    }
+
+    .register-btn {
+        background-color: #556b2f;
+        color: white;
+        padding: 12px 18px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+        font-size: 16px;
+        width: 100%;
+        text-align: center;
+        margin-top: 15px;
+    }
+
+    .register-btn:hover {
+        background-color: #6b8e23;
+    }
+
+    .full-event {
+        color: red;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .message {
+        margin-top: 20px;
+        font-size: 17px;
+        font-weight: bold;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .success {
+        color: #fff;
+        background: #4CAF50;
+    }
+
+    .error {
+        color: #fff;
+        background: #D32F2F;
+    }
+</style>
+
+<div class="container">
+    <h1 style="color: #556b2f;">Register for Event</h1>
+
+    @if (EventDetails != null)
+    {
+        <div class="card">
+            <!-- Centered Yoga Title -->
+            <div class="title-box">Yoga</div>
+
+            <!-- Left-Aligned Event Details -->
+            <p class="event-detail"><strong>Description:</strong> @EventDetails.EventDescription</p>
+            <p class="event-detail"><strong>Date:</strong> @EventDetails.EventDate.ToString("f")</p>
+            <p class="event-detail"><strong>Location:</strong> @EventDetails.EventLocation</p>
+            <p class="event-detail"><strong>Participants:</strong> @CurrentParticipants / @EventDetails.MaxParticipants</p>
+            <p class="event-detail"><strong>Volunteers Needed:</strong> @EventDetails.VolunteersRequired</p>
+           
+            @if (CurrentParticipants < EventDetails.MaxParticipants)
+            {
+                <button class="register-btn" @onclick="RegisterToEvent">Register</button>
+            }
+            else
+            {
+                <p class="full-event">This event is full.</p>
+            }
+        </div>
+    }
+    else
+    {
+        <p>Loading event details...</p>
+    }
+
+    @if (!string.IsNullOrEmpty(Message))
+    {
+        <p class="message @(Message.Contains("Successfully") ? "success" : "error")">@Message</p>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    private Event? EventDetails { get; set; }
+    private int CurrentParticipants { get; set; }
+    private string Message { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadEventDetails();
+    }
+
+    private async Task LoadEventDetails()
+    {
+        EventDetails = await DbContext.Events.FindAsync(EventId);
+
+        if (EventDetails != null)
+        {
+            CurrentParticipants = await DbContext.EventRegistrations
+                .CountAsync(e => e.EventId == EventId);
+        }
+    }
+
+    private async Task RegisterToEvent()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            var username = user.Identity.Name;
+
+            if (!string.IsNullOrEmpty(username))
+            {
+                var loggedInUser = await DbContext.UserAccounts
+                    .FirstOrDefaultAsync(u => u.UserName == username);
+
+                if (loggedInUser != null)
+                {
+                    var userId = loggedInUser.Id;
+
+                    if (EventDetails == null)
+                    {
+                        Message = "Event not found.";
+                        return;
+                    }
+
+                    // Check if the user is already registered
+                    var existingRegistration = await DbContext.EventRegistrations
+                        .AnyAsync(e => e.EventId == EventId && e.UserId == userId);
+
+                    if (existingRegistration)
+                    {
+                        Message = "You are already registered for this event.";
+                        return;
+                    }
+
+                    if (CurrentParticipants >= EventDetails.MaxParticipants)
+                    {
+                        Message = "This event has reached its maximum number of participants.";
+                        return;
+                    }
+
+                    var registration = new EventRegistration
+                    {
+                        UserId = userId,
+                        EventId = EventId,
+                        RegistrationDate = DateTime.UtcNow
+                    };
+
+                    DbContext.EventRegistrations.Add(registration);
+                    await DbContext.SaveChangesAsync();
+
+                    Message = $"Successfully registered for event {EventDetails.EventTitle}!";
+                    
+                    // Refresh participant count
+                    CurrentParticipants++;
+                }
+                else
+                {
+                    Message = "User account not found in the database.";
+                }
+            }
+            else
+            {
+                Message = "Username is missing from authentication state.";
+            }
+        }
+        else
+        {
+            Message = "You must be logged in to register for an event.";
+        }
+    }
+}

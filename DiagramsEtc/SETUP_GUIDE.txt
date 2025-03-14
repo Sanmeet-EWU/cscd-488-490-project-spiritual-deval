@@ -1,0 +1,42 @@
+Download VScode:
+    https://code.visualstudio.com/download
+
+Download the newest version of Microsoft .NET for your platform:
+    https://dotnet.microsoft.com/en-us/download/dotnet/8.0
+
+Ensure .NET 8 SDK is installed. You can check with the command:
+    dotnet --version
+
+Install the following extensions in VScode:
+    C# Dev Kit, C#, Blazor snippets
+
+Clone the Spiritual Deval repo:
+    git clone https://github.com/Sanmeet-EWU/cscd-488-490-project-spiritual-deval
+
+Navigate to the repo directory
+
+Create a new Blazor project:
+    dotnet new blazor -o SpiritualDevalApp
+
+Navigate to the SpiritualDevalApp directory and run the command:
+    dotnet run
+This will begin hosting the application locally at http://localhost:5164
+
+Inside the same directory, install xunit packages:
+    dotnet add package xunit
+    dotnet add package xunit.runner.visualstudio
+
+Navigate back to the root directory of the repo, and create a new xunit test project:
+    dotnet new xunit -o SpiritualDevalApp.Tests
+
+Navigate to SpiritualDevalApp.Tests
+
+Add a reference to the project:
+    dotnet add reference ../SpiritualDevalApp/SpiritualDevalApp.csproj
+
+Ensure that xunit versions in the project and test project are the same
+
+In the same directory, run the tests:
+    dotnet test
+
+All necessary packages, testing libraries, and debugging tools have now been set up.

@@ -1,0 +1,64 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<nav class="nav-bar">
+    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> <nl2>Home</nl2>
+    </NavLink>
+
+    <NavLink class="nav-link" href="about">
+        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> <nl2>About</nl2>
+    </NavLink>
+
+    <NavLink class="nav-link" href="donation">
+        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> <nl2>Donation</nl2>
+    </NavLink>
+
+    <NavLink class="nav-link" href="volunteer">
+        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> <nl2>Volunteer</nl2>
+    </NavLink>
+
+<!---
+    <NavLink class="nav-link" href="contact">
+        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> <nl2>Contact</nl2>
+    </NavLink>
+    --->
+
+    @if (isAuthenticated)
+    {
+        <NavLink class="nav-link" href="my-account">
+            <span class="bi bi-person-circle-nav-menu" aria-hidden="true"></span> <nl2>My Account</nl2>
+        </NavLink>
+
+        @if (isAdmin)
+        {
+            <NavLink class="nav-link" href="admin">
+                <span class="bi bi-gear-fill-nav-menu" aria-hidden="true"></span> <nl2>Admin</nl2>
+            </NavLink>
+        }
+
+        <NavLink class="nav-link" href="logout">
+            <span class="bi bi-box-arrow-right-nav-menu" aria-hidden="true"></span> <nl2>Logout</nl2>
+        </NavLink>
+    }
+    else
+    {
+        <NavLink class="nav-link" href="login">
+            <span class="bi bi-box-arrow-in-right-nav-menu" aria-hidden="true"></span> <nl2>Login</nl2>
+        </NavLink>
+    }
+</nav>
+
+@code {
+    private bool isAuthenticated;
+    private bool isAdmin;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        isAuthenticated = user.Identity?.IsAuthenticated ?? false;
+        isAdmin = user.IsInRole("Administrator");
+    }
+}

@@ -1,0 +1,136 @@
+@page "/CreateAccount"
+@layout MainLayout
+@rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using SpiritualDevalApp.Data
+@using Microsoft.AspNetCore.Identity
+@using SpiritualDevalApp.Models.Entities
+@using System.ComponentModel.DataAnnotations
+
+<PageTitle>Create Account</PageTitle>
+
+<div class="row">
+    <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border">
+        <EditForm Model="user" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="mb-3 text-center flex-column">
+                <h3>CREATE ACCOUNT</h3>
+            </div>
+
+            <div class="mb-3">
+                <label for="userNameInput">User Name:</label>
+                <InputText id="userNameInput" @bind-Value="user.UserName" class="form-control" />
+                <ValidationMessage For="@(() => user.UserName)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="passwordInput">Password:</label>
+                <InputText id="passwordInput" @bind-Value="password" class="form-control" type="password" />
+                <ValidationMessage For="@(() => password)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="firstNameInput">First Name:</label>
+                <InputText id="firstNameInput" @bind-Value="user.FirstName" class="form-control" />
+                <ValidationMessage For="@(() => user.FirstName)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="lastNameInput">Last Name:</label>
+                <InputText id="lastNameInput" @bind-Value="user.LastName" class="form-control" />
+                <ValidationMessage For="@(() => user.LastName)" />
+            </div>
+
+            <div class="mb-3">
+                <label for="emailInput">Email:</label>
+                <InputText id="emailInput" @bind-Value="user.Email" class="form-control" />
+                <ValidationMessage For="@(() => user.Email)" />
+            </div>
+
+            <div class="mb-3 d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </EditForm>
+
+        <div class="mt-3 text-center">
+            <p>Already have an account? <NavLink href="/login">Login here</NavLink></p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .col-lg-4 {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary {
+        width: 100%;
+        background-color: #3e654a; /* Matches the admin mail button */
+        padding: 12px;
+        font-size: 16px;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #2e4d39; /* Darker green hover effect */
+    }
+</style>
+
+@code {
+    private UserModel user = new UserModel();
+    private string password = string.Empty;
+
+    [Inject] private AppDbContext DbContext { get; set; } = null!;
+    [Inject] private IPasswordHasher<UserAccount> PasswordHasher { get; set; } = null!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+
+    private async Task HandleValidSubmit()
+    {
+        if (string.IsNullOrWhiteSpace(password))
+        {
+            return; // Password should not be empty
+        }
+
+        bool isFirstUser = !await DbContext.UserAccounts.AnyAsync();
+        var hashedPassword = PasswordHasher.HashPassword(new UserAccount(), password);
+
+        var newUser = new UserAccount
+        {
+            UserName = user.UserName,
+            Password = hashedPassword,
+            Role = isFirstUser ? "Administrator" : "User",
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email
+        };
+
+        await DbContext.UserAccounts.AddAsync(newUser);
+        await DbContext.SaveChangesAsync();
+        NavigationManager.NavigateTo("/login");
+    }
+
+    public class UserModel
+    {
+        [Required(ErrorMessage = "User Name is required")]
+        public string UserName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "First Name is required")]
+        public string FirstName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Last Name is required")]
+        public string LastName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email format")]
+        public string Email { get; set; } = string.Empty;
+    }
+}

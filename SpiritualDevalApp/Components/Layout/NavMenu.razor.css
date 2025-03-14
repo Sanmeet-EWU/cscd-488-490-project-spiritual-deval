@@ -1,0 +1,47 @@
+.nav-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    height: 100%;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color:black;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    height: 3rem;
+    line-height: 3rem;
+}
+
+.nav-link.active {
+    background-color: rgb(255, 255, 255);
+    color: black;
+}
+
+.nav-link:hover {
+    background-color: rgb(255, 255, 255);
+    color:black
+}
+
+/* Reuse icon styles */
+.bi {
+    display: inline-block;
+    position: relative;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+    top: -1px;
+    background-size: cover;
+    color: green;
+}
+
+nl2{
+    color: #3e8e41;
+}

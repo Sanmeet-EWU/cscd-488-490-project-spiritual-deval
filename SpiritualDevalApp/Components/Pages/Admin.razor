@@ -1,0 +1,221 @@
+@page "/admin"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@using SpiritualDevalApp.Data
+@using SpiritualDevalApp.Models.Entities
+@inject AppDbContext DbContext
+@attribute [Authorize(Roles = "Administrator")]
+
+@code {
+    private IEnumerable<Event>? UpcomingEvents;
+    private IEnumerable<Event>? PastEvents;
+    private Dictionary<int, List<(UserAccount User, string SkillsProvided)>> VolunteersByEvent = new();
+    private Dictionary<int, List<UserAccount>> RegisteredUsersByEvent = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var currentDate = DateTime.Now;
+        UpcomingEvents = await DbContext.Events
+            .Where(e => e.EventDate >= currentDate)
+            .OrderBy(e => e.EventDate)
+            .ToListAsync();
+
+        PastEvents = await DbContext.Events
+            .Where(e => e.EventDate < currentDate)
+            .OrderByDescending(e => e.EventDate)
+            .ToListAsync();
+
+        await LoadRegisteredUsers();
+        await LoadVolunteers();
+    }
+
+    private async Task LoadRegisteredUsers()
+    {
+        var registrations = await DbContext.EventRegistrations
+            .Include(er => er.User)
+            .ToListAsync();
+
+        RegisteredUsersByEvent = registrations
+            .GroupBy(er => er.EventId)
+            .ToDictionary(g => g.Key, g => g.Select(er => er.User).ToList());
+    }
+
+    private async Task LoadVolunteers()
+    {
+        var volunteers = await DbContext.VolunteerRegistrations
+            .Include(vr => vr.User)
+            .ToListAsync();
+
+        VolunteersByEvent = volunteers
+            .GroupBy(vr => vr.EventId)
+            .ToDictionary(g => g.Key, g => g.Select(vr => (vr.User, vr.SkillsProvided)).ToList());
+    }
+}
+
+<h1>Event Management</h1>
+
+<div style="text-align: center;">
+    <NavLink class="btn" href="/admin/event/create">Create Event</NavLink>
+    <NavLink class="btn" href="/admin/mail">Send Volunteer Update</NavLink>
+    <NavLink class="btn" href="/admin/promote">Promote User To Admin</NavLink>
+</div>
+
+<section class="Events">
+    <h2>Upcoming Events</h2>
+    @if (UpcomingEvents != null && UpcomingEvents.Any())
+    {
+        <ul>
+            @foreach (var eventItem in UpcomingEvents)
+            {
+                <li>
+                    <details>
+                        <summary>@eventItem.EventTitle</summary>
+
+                        <details>
+                            <summary>Registered Users</summary>
+                            @if (RegisteredUsersByEvent.TryGetValue(eventItem.EventId, out var users) && users.Any())
+                            {
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var user in users)
+                                        {
+                                            <tr>
+                                                <td>@user.FirstName @user.LastName</td>
+                                                <td>@user.Email</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <p>No users registered for this event.</p>
+                            }
+                        </details>
+
+                        <details>
+                            <summary>Volunteers</summary>
+                            @if (VolunteersByEvent.TryGetValue(eventItem.EventId, out var volunteers) && volunteers.Any())
+                            {
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Skills Provided</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var (user, skills) in volunteers)
+                                        {
+                                            <tr>
+                                                <td>@user.FirstName @user.LastName</td>
+                                                <td>@user.Email</td>
+                                                <td>@(string.IsNullOrWhiteSpace(skills) ? "N/A" : skills)</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <p>No volunteers registered for this event.</p>
+                            }
+                        </details>
+
+                    </details>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>No upcoming events.</p>
+    }
+</section>
+
+<section class="Events">
+    <h2>Past Events</h2>
+    @if (PastEvents != null && PastEvents.Any())
+    {
+        <ul>
+            @foreach (var eventItem in PastEvents)
+            {
+                <li>
+                    <details>
+                        <summary>@eventItem.EventTitle</summary>
+
+                        <details>
+                            <summary>Registered Users</summary>
+                            @if (RegisteredUsersByEvent.TryGetValue(eventItem.EventId, out var users) && users.Any())
+                            {
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var user in users)
+                                        {
+                                            <tr>
+                                                <td>@user.FirstName @user.LastName</td>
+                                                <td>@user.Email</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <p>No users registered for this event.</p>
+                            }
+                        </details>
+
+                        <details>
+                            <summary>Volunteers</summary>
+                            @if (VolunteersByEvent.TryGetValue(eventItem.EventId, out var volunteers) && volunteers.Any())
+                            {
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Skills Provided</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var (user, skills) in volunteers)
+                                        {
+                                            <tr>
+                                                <td>@user.FirstName @user.LastName</td>
+                                                <td>@user.Email</td>
+                                                <td>@(string.IsNullOrWhiteSpace(skills) ? "N/A" : skills)</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <p>No volunteers registered for this event.</p>
+                            }
+                        </details>
+
+                    </details>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>No past events.</p>
+    }
+</section>
