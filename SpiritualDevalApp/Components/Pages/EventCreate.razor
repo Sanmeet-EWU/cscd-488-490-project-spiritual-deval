@@ -1,41 +1,50 @@
 @page "/admin/event/create"
 @layout MainLayout
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
 @using SpiritualDevalApp.Models.Entities
 @using SpiritualDevalApp.Data
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Administrator")]
 
-<h3>Create New Event</h3>
+
 <EditForm Model="eventModel" OnValidSubmit="HandleValidSubmit">
-    <div class="form-group">
-        <label for="EventTitle">Event Title</label>
-        <InputText id="EventTitle" class="form-control" @bind-Value="eventModel.EventTitle" />
+    <div class="form-container">
+        <div class="form-group">
+            <label for="EventTitle">Event Title</label>
+            <InputText id="EventTitle" class="form-control" @bind-Value="eventModel.EventTitle" placeholder="Enter event title" />
+        </div>
+        <div class="form-group">
+            <label for="EventDescription">Event Description</label>
+            <InputTextArea id="EventDescription" class="form-control" @bind-Value="eventModel.EventDescription" placeholder="Enter event description" />
+        </div>
+        <div class="form-group">
+            <label for="EventDate">Event Date</label>
+            <InputDate id="EventDate" class="form-control" @bind-Value="eventModel.EventDate" />
+        </div>
+        <div class="form-group">
+            <label for="EventLocation">Event Location</label>
+            <InputText id="EventLocation" class="form-control" @bind-Value="eventModel.EventLocation" placeholder="Enter event location" />
+        </div>
+        <div class="form-group">
+            <label for="MaxParticipants">Max Participants</label>
+            <InputNumber id="MaxParticipants" class="form-control" @bind-Value="eventModel.MaxParticipants" />
+        </div>
+        <div class="form-group">
+            <label for="VolunteersRequired">Volunteers Required</label>
+            <InputNumber id="VolunteersRequired" class="form-control" @bind-Value="eventModel.VolunteersRequired" />
+        </div>
+        <div class="form-group">
+            <label for="SkillsRequired">Skills Required</label>
+            <InputText id="SkillsRequired" class="form-control" @bind-Value="eventModel.SkillsRequired" placeholder="Enter skills required" />
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-submit">Create Event</button>
+        </div>
     </div>
-    <div class="form-group">
-        <label for="EventDescription">Event Description</label>
-        <InputTextArea id="EventDescription" class="form-control" @bind-Value="eventModel.EventDescription" />
-    </div>
-    <div class="form-group">
-        <label for="EventDate">Event Date</label>
-        <InputDate id="EventDate" class="form-control" @bind-Value="eventModel.EventDate" />
-    </div>
-    <div class="form-group">
-        <label for="EventLocation">Event Location</label>
-        <InputText id="EventLocation" class="form-control" @bind-Value="eventModel.EventLocation" />
-    </div>
-    <div class="form-group">
-        <label for="MaxParticipants">Max Participants</label>
-        <InputNumber id="MaxParticipants" class="form-control" @bind-Value="eventModel.MaxParticipants" />
-    </div>
-    <div class="form-group">
-        <label for="VolunteersRequired">Volunteers Required</label>
-        <InputNumber id="VolunteersRequired" class="form-control" @bind-Value="eventModel.VolunteersRequired" />
-    </div>
-    <div class="form-group">
-        <label for="SkillsRequired">Skills Required</label>
-        <InputText id="SkillsRequired" class="form-control" @bind-Value="eventModel.SkillsRequired" />
-    </div>
-    <button type="submit" class="btn btn-primary">Create Event</button>
 </EditForm>
+
 @code {
     private Event eventModel = new Event();
 
@@ -44,9 +53,67 @@
         // Save the new SpiritualEvent to the database
         await DbContext.Events.AddAsync(eventModel);
         await DbContext.SaveChangesAsync();
-
     }
 
     [Inject]
     private AppDbContext DbContext { get; set; } 
 }
+
+<style>
+    .form-title {
+        text-align: center;
+        color: #3e654a;
+        font-size: 24px;
+        margin-bottom: 30px;
+    }
+
+    .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .form-group .form-control {
+        width: 100%;
+        padding: 12px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        font-size: 16px;
+        box-sizing: border-box;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-group .form-control:focus {
+        border-color: #3e654a;
+        outline: none;
+    }
+
+    .btn-submit {
+        width: 100%;
+        background-color: #3e654a;
+        border: none;
+        padding: 14px;
+        font-size: 16px;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        background-color: #2e4d39;
+    }
+</style>

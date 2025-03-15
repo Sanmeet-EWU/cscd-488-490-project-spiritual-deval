@@ -9,8 +9,8 @@
 @code {
     private IEnumerable<Event>? UpcomingEvents;
     private IEnumerable<Event>? PastEvents;
+    private Dictionary<int, List<(UserAccount User, string SkillsProvided)>> VolunteersByEvent = new();
     private Dictionary<int, List<UserAccount>> RegisteredUsersByEvent = new();
-    private Dictionary<int, List<UserAccount>> VolunteersByEvent = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -48,7 +48,7 @@
 
         VolunteersByEvent = volunteers
             .GroupBy(vr => vr.EventId)
-            .ToDictionary(g => g.Key, g => g.Select(vr => vr.User).ToList());
+            .ToDictionary(g => g.Key, g => g.Select(vr => (vr.User, vr.SkillsProvided)).ToList());
     }
 }
 
@@ -57,7 +57,7 @@
 <div style="text-align: center;">
     <NavLink class="btn" href="/admin/event/create">Create Event</NavLink>
     <NavLink class="btn" href="/admin/mail">Send Volunteer Update</NavLink>
-    <NavLink class="btn" href="/admin/promote">Promote User To Admin </NavLink>
+    <NavLink class="btn" href="/admin/promote">Promote User To Admin</NavLink>
 </div>
 
 <section class="Events">
@@ -108,14 +108,16 @@
                                         <tr>
                                             <th>Name</th>
                                             <th>Email</th>
+                                            <th>Skills Provided</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (var user in volunteers)
+                                        @foreach (var (user, skills) in volunteers)
                                         {
                                             <tr>
                                                 <td>@user.FirstName @user.LastName</td>
                                                 <td>@user.Email</td>
+                                                <td>@(string.IsNullOrWhiteSpace(skills) ? "N/A" : skills)</td>
                                             </tr>
                                         }
                                     </tbody>
@@ -186,14 +188,16 @@
                                         <tr>
                                             <th>Name</th>
                                             <th>Email</th>
+                                            <th>Skills Provided</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (var user in volunteers)
+                                        @foreach (var (user, skills) in volunteers)
                                         {
                                             <tr>
                                                 <td>@user.FirstName @user.LastName</td>
                                                 <td>@user.Email</td>
+                                                <td>@(string.IsNullOrWhiteSpace(skills) ? "N/A" : skills)</td>
                                             </tr>
                                         }
                                     </tbody>

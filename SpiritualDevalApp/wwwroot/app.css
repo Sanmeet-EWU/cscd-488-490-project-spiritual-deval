@@ -1,5 +1,7 @@
-html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+body {
+    font-family: 'Georgia', 'Times New Roman', serif; /* Set global font */
+    color: #333;
+    line-height: 1.6;
 }
 
 a, .btn-link {
