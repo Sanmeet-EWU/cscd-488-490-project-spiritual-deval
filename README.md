@@ -1,5 +1,8 @@
 # SpiritualDevalApp
 
+## Spiritual Deval: Live Demo
+[Watch the live demo on YouTube](https://www.youtube.com/watch?v=5KyD68xe5zs)
+
 ## Overview
 
 SpiritualDevalApp is a web application designed to improve communication, event management, and volunteering for spiritual temples. The app allows users to register for events, volunteer, and stay updated on temple activities. It also provides an admin panel for managing users, events, and volunteer updates.
@@ -7,10 +10,9 @@ SpiritualDevalApp is a web application designed to improve communication, event 
 ## Installation
 
 ### Prerequisites
-- .NET 7.0+
+- .NET 8.0
 - MySQL Server
-- Visual Studio Code or Visual Studio
-- Blazor Server Template
+- Visual Studio Code
 
 ### Steps
 1. **Clone the repository**
