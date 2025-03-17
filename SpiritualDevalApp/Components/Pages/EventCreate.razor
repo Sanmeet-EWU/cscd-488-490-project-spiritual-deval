@@ -8,7 +8,6 @@
 @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize(Roles = "Administrator")]
 
-
 <EditForm Model="eventModel" OnValidSubmit="HandleValidSubmit">
     <div class="form-container">
         <div class="form-group">
@@ -42,17 +41,22 @@
         <div class="form-group">
             <button type="submit" class="btn btn-submit">Create Event</button>
         </div>
+        @if (showSuccessMessage)
+        {
+            <div class="success-message">Event Created</div>
+        }
     </div>
 </EditForm>
 
 @code {
     private Event eventModel = new Event();
+    private bool showSuccessMessage = false;
 
     private async Task HandleValidSubmit()
     {
-        // Save the new SpiritualEvent to the database
         await DbContext.Events.AddAsync(eventModel);
         await DbContext.SaveChangesAsync();
+        showSuccessMessage = true;
     }
 
     [Inject]
@@ -115,5 +119,15 @@
 
     .btn-submit:hover {
         background-color: #2e4d39;
+    }
+
+    .success-message {
+        margin-top: 10px;
+        padding: 10px;
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        border-radius: 5px;
+        text-align: center;
     }
 </style>
