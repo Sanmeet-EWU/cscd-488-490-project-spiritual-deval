@@ -17,7 +17,7 @@ SpiritualDevalApp is a web application designed to improve communication, event 
 ### Steps
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/Sanmeet-EWU/cscd-488-490-project-spiritual-deval/
+   git clone https://github.com/Sanmeet-EWU/cscd-488-490-project-spiritual-deval.git
    cd SpiritualDevalApp
    ```
 
