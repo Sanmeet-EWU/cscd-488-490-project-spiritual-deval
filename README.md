@@ -1,2 +1,55 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/ixLrLXsm)
-[![Open in Codespaces](https://classroom.github.com/assets/launch-codespace-2972f46106e565e64193e422d61a12cf1da4916b45550586e14ef0a7c637dd04.svg)](https://classroom.github.com/open-in-codespaces?assignment_repo_id=16317489)
+# SpiritualDevalApp
+
+## Overview
+
+SpiritualDevalApp is a web application designed to improve communication, event management, and volunteering for spiritual temples. The app allows users to register for events, volunteer, and stay updated on temple activities. It also provides an admin panel for managing users, events, and volunteer updates.
+
+## Installation
+
+### Prerequisites
+- .NET 7.0+
+- MySQL Server
+- Visual Studio Code or Visual Studio
+- Blazor Server Template
+
+### Steps
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Sanmeet-EWU/cscd-488-490-project-spiritual-deval/
+   cd SpiritualDevalApp
+   ```
+
+2. **Configure the database**
+   - Update the connection string in `appsettings.json` to match your MySQL setup.
+
+3. **Run the application**
+   ```bash
+   dotnet run
+   ```
+
+4. **Access the app**
+   - Open a browser and go to `http://localhost:5164` (or the port Blazor assigns).
+
+---
+
+## Usage Details
+
+### General Users
+- **Homepage**: View upcoming events and register or volunteer.
+- **Event Page**: Shows event details and allows registration or volunteering.
+- **Volunteering**: Click **Volunteer → Subscribe for updates** to receive volunteer notifications.
+- **About Page**: Provides information about the temple.
+- **Donation Page**: Placeholder for future donation functionality.
+- **Volunteer Page**: Explains how users can get involved.
+- **Account Creation**: Click **Get In Touch → Create an account** (required for event registration/volunteering).
+
+### Admin Users
+- **Admin Dashboard**: View registered users and volunteers.
+- **Create Events**: Click **Create Event**, fill out details, and submit. The event will appear on the homepage.
+- **Promote Users**: Click **Promote User to Admin**, enter the user’s email to grant admin privileges.
+- **Send Volunteer Updates**: Click **Send Volunteer Update**, enter a title and message, and send emails to all subscribed volunteers.
+
+### Authentication
+- **New Users**: Sign up via the Login Page (“Don’t have an account? Create one.”).
+- **Existing Users**: Log in with your credentials.
+- **First Admin**: The first registered user is assigned admin privileges automatically.
